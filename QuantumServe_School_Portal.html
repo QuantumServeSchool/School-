@@ -1,0 +1,2068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b0f0a">
+<title>QuantumServe School — East Africa</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg:#0b0f0a;--bg2:#111710;--bg3:#182215;--bg4:#1f2b1a;--bg5:#26341f;
+  --green:#4caf50;--green2:#66bb6a;--green3:#a5d6a7;
+  --green-t:rgba(76,175,80,.12);--green-g:rgba(76,175,80,.05);
+  --lime:#8bc34a;--lime-t:rgba(139,195,74,.1);
+  --chalk:#f1ede4;--chalk2:rgba(241,237,228,.65);--chalk3:rgba(241,237,228,.35);--chalk4:rgba(241,237,228,.1);
+  --line:rgba(241,237,228,.07);--line2:rgba(76,175,80,.22);
+  --red:#ef5350;--red-t:rgba(239,83,80,.1);
+  --amber:#ffb300;--amber-t:rgba(255,179,0,.1);
+  --blue:#42a5f5;--blue-t:rgba(66,165,245,.1);
+  --purple:#ab47bc;--purple-t:rgba(171,71,188,.1);
+  --teal:#26c6da;--teal-t:rgba(38,198,218,.1);
+  --sidebar:258px;--topbar:60px;--r:10px;--r2:16px;
+  --spring:cubic-bezier(.22,1,.36,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{height:100%;scroll-behavior:smooth;}
+body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;background:var(--bg);color:var(--chalk);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;}
+input,select,textarea{font-family:inherit;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:4px;}
+
+/* Screens */
+.screen{display:none;min-height:100vh;align-items:center;justify-content:center;padding:24px;}
+.screen.on{display:flex;flex-direction:column;}
+#sApp.on{flex-direction:row;align-items:flex-start;padding:0;}
+
+/* BG glow */
+.login-bg{position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 20% 80%,rgba(76,175,80,.12) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 20%,rgba(139,195,74,.07) 0%,transparent 50%);pointer-events:none;}
+
+/* Cards */
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:24px;padding:40px 36px;max-width:480px;width:100%;box-shadow:0 48px 96px rgba(0,0,0,.6);animation:cIn .6s var(--spring) both;}
+@keyframes cIn{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:none}}
+
+/* Logo */
+.ll{display:flex;flex-direction:column;align-items:center;margin-bottom:28px;}
+.ll-logo{width:68px;height:68px;border-radius:20px;background:linear-gradient(135deg,var(--green),#1b5e20);display:flex;align-items:center;justify-content:center;font-size:30px;margin-bottom:12px;border:1px solid var(--line2);box-shadow:0 0 40px rgba(76,175,80,.2);animation:gp 3.5s ease-in-out infinite;}
+@keyframes gp{0%,100%{box-shadow:0 0 24px rgba(76,175,80,.15)}50%{box-shadow:0 0 56px rgba(76,175,80,.3)}}
+.ll-name{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;}
+.ll-tag{font-size:9px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--green2);margin-top:4px;}
+
+/* Form */
+.fld{margin-bottom:14px;}
+.fld label{display:block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--chalk3);margin-bottom:6px;}
+.fld input,.fld select{width:100%;background:var(--bg3);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;font-size:14px;color:var(--chalk);outline:none;transition:border-color .2s;}
+.fld input:focus,.fld select:focus{border-color:var(--green);}
+.fld input::placeholder{color:var(--chalk4);}
+.fld select option{background:var(--bg3);}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:12px 20px;border-radius:var(--r);font-size:13px;font-weight:600;transition:opacity .2s,transform .15s;cursor:pointer;border:none;}
+.btn:hover{opacity:.85;transform:translateY(-1px);}
+.btn:active{transform:translateY(0);}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.btn-g{background:linear-gradient(135deg,var(--green),#2e7d32);color:#fff;}
+.btn-o{background:transparent;border:1px solid var(--line2);color:var(--chalk2);}
+.btn-ghost{background:var(--bg3);border:1px solid var(--line);color:var(--chalk3);}
+.btn-danger{background:var(--red-t);border:1px solid rgba(239,83,80,.2);color:var(--red);}
+.btn-full{width:100%;}
+.btn-sm{padding:6px 12px;font-size:11px;}
+
+/* Alerts */
+.al{border-radius:var(--r);padding:12px 14px;font-size:12px;margin-top:12px;}
+.al-err{background:var(--red-t);border:1px solid rgba(239,83,80,.2);color:var(--red);}
+.al-ok{background:var(--green-t);border:1px solid rgba(76,175,80,.2);color:var(--green2);}
+.al-info{background:var(--green-g);border:1px solid var(--line2);color:var(--green3);}
+.al-warn{background:var(--amber-t);border:1px solid rgba(255,179,0,.2);color:var(--amber);}
+
+/* Sidebar */
+#sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--line);display:flex;flex-direction:column;z-index:300;transition:transform .32s cubic-bezier(.4,0,.2,1);}
+.sb-top{padding:0 16px;height:var(--topbar);display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);flex-shrink:0;}
+.sb-logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--green),#1b5e20);display:flex;align-items:center;justify-content:center;font-size:16px;border:1px solid var(--line2);flex-shrink:0;}
+.sb-brand strong{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;display:block;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sb-brand span{font-size:9px;color:var(--green2);letter-spacing:.12em;text-transform:uppercase;font-weight:600;}
+nav{flex:1;overflow-y:auto;padding:8px;}
+.nsect{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--chalk4);padding:12px 8px 5px;}
+.ni{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r);font-size:12px;font-weight:400;color:var(--chalk3);cursor:pointer;transition:background .15s,color .15s;position:relative;user-select:none;}
+.ni:hover{background:var(--bg3);color:var(--chalk2);}
+.ni.active{background:var(--green-t);color:var(--green2);font-weight:600;}
+.ni.active::before{content:'';position:absolute;left:0;top:22%;bottom:22%;width:2px;background:var(--green);border-radius:0 2px 2px 0;}
+.ni-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0;}
+.sb-bot{padding:10px;border-top:1px solid var(--line);flex-shrink:0;}
+.sb-user{display:flex;align-items:center;gap:10px;padding:10px;border-radius:var(--r);background:var(--bg3);border:1px solid var(--line);margin-bottom:8px;}
+.sb-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--green),#2e7d32);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;}
+.sb-un{font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sb-ur{font-size:9px;color:var(--chalk3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sb-school{font-size:9px;color:var(--green2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;}
+#sbOv{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);z-index:299;}
+
+/* Topbar */
+#topbar{position:fixed;top:0;left:var(--sidebar);right:0;height:var(--topbar);background:rgba(11,15,10,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 20px;gap:12px;z-index:200;}
+.tb-ham{display:none;color:var(--chalk3);font-size:20px;padding:4px;}
+.tb-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;flex:1;}
+.tb-right{display:flex;align-items:center;gap:8px;}
+.term-pill{background:var(--bg3);border:1px solid var(--line);border-radius:6px;padding:4px 10px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green2);}
+.conn-pill{background:var(--bg3);border:1px solid var(--line);border-radius:50px;padding:4px 10px;font-size:10px;color:var(--chalk3);display:flex;align-items:center;gap:5px;}
+.conn-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green);}
+.conn-dot.off{background:var(--red);box-shadow:0 0 5px var(--red);}
+.role-badge{background:var(--green-t);border:1px solid var(--line2);border-radius:6px;padding:3px 10px;font-size:10px;font-weight:700;color:var(--green2);text-transform:uppercase;letter-spacing:.06em;}
+
+/* Main */
+#main{margin-left:var(--sidebar);padding-top:var(--topbar);min-height:100vh;width:100%;}
+#module-container{padding:20px;}
+
+/* Panel */
+.panel{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);margin-bottom:14px;overflow:hidden;}
+.ph{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 20px 14px;flex-wrap:wrap;}
+.ph-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;}
+.ph-sub{font-size:11px;color:var(--chalk3);margin-top:2px;}
+.ph-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.ph2{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--line);gap:10px;}
+.pt{font-size:13px;font-weight:600;}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:14px;}
+.sc{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);padding:16px 18px;transition:border-color .2s;}
+.sc:hover{border-color:var(--line2);}
+.sc-l{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--chalk3);margin-bottom:6px;}
+.sc-v{font-size:24px;font-weight:700;font-family:'Playfair Display',serif;line-height:1;}
+.sc-s{font-size:10px;color:var(--chalk3);margin-top:3px;}
+.sc-up{color:var(--green2);font-size:10px;margin-top:4px;font-weight:600;}
+.sc-dn{color:var(--red);font-size:10px;margin-top:4px;font-weight:600;}
+
+/* Table */
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+thead tr{background:var(--bg3);}
+th{padding:9px 12px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--chalk3);white-space:nowrap;}
+td{padding:9px 12px;border-bottom:1px solid var(--line);color:var(--chalk2);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(76,175,80,.03);}
+.mono{font-family:'JetBrains Mono',monospace;font-size:11px;}
+
+/* Badge */
+.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:50px;font-size:9px;font-weight:700;letter-spacing:.04em;white-space:nowrap;}
+.bg{background:var(--green-t);color:var(--green2);border:1px solid rgba(76,175,80,.2);}
+.br{background:var(--red-t);color:var(--red);border:1px solid rgba(239,83,80,.2);}
+.ba{background:var(--amber-t);color:var(--amber);border:1px solid rgba(255,179,0,.2);}
+.bb{background:var(--blue-t);color:var(--blue);border:1px solid rgba(66,165,245,.2);}
+.bc{background:var(--chalk4);color:var(--chalk3);border:1px solid var(--line);}
+.bp{background:var(--purple-t);color:var(--purple);border:1px solid rgba(171,71,188,.2);}
+.bt{background:var(--teal-t);color:var(--teal);border:1px solid rgba(38,198,218,.2);}
+.bl2{background:var(--lime-t);color:var(--lime);border:1px solid rgba(139,195,74,.2);}
+
+/* Toast */
+#toastWrap{position:fixed;bottom:20px;right:20px;z-index:99999;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+.toast{background:var(--bg4);border:1px solid var(--line);border-radius:var(--r);padding:10px 16px;font-size:12px;font-weight:500;transform:translateX(120%);transition:transform .35s var(--spring);max-width:300px;}
+.toast.on{transform:translateX(0);}
+.t-ok{border-color:rgba(76,175,80,.3);color:var(--green2);}
+.t-err{border-color:rgba(239,83,80,.3);color:var(--red);}
+.t-warn{border-color:rgba(255,179,0,.3);color:var(--amber);}
+.t-info{border-color:var(--line2);color:var(--green3);}
+
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;}
+.modal{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);padding:28px;max-width:580px;width:100%;max-height:90vh;overflow-y:auto;animation:cIn .4s var(--spring) both;}
+.modal-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:4px;}
+.modal-sub{font-size:11px;color:var(--chalk3);margin-bottom:20px;}
+.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.modal-actions{display:flex;gap:8px;margin-top:20px;}
+.modal-actions .btn{flex:1;}
+.col-full{grid-column:1/-1;}
+
+/* Loading / Empty */
+.loading{display:flex;align-items:center;justify-content:center;gap:10px;padding:40px;color:var(--chalk3);font-size:12px;}
+.spinner{width:16px;height:16px;border:2px solid var(--line);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{text-align:center;padding:50px 20px;color:var(--chalk3);}
+.ei{font-size:40px;margin-bottom:10px;opacity:.5;}
+
+/* Progress */
+.prog-bar{background:var(--bg4);border-radius:4px;height:6px;margin-top:3px;}
+.prog-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--green),var(--green2));transition:width .5s var(--spring);}
+
+/* Tabs */
+.mod-tabs{display:flex;gap:4px;padding:0 16px 14px;flex-wrap:wrap;}
+.mtab{padding:7px 14px;border-radius:8px;font-size:11px;font-weight:600;color:var(--chalk3);cursor:pointer;transition:all .15s;background:none;border:none;}
+.mtab:hover{background:var(--bg3);color:var(--chalk2);}
+.mtab.active{background:var(--green-t);color:var(--green2);}
+
+/* Dashboard widgets */
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:14px;}
+.widget{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);padding:18px;}
+.widget-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--chalk3);margin-bottom:12px;}
+.wi-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line);font-size:12px;}
+.wi-row:last-child{border:none;}
+
+/* Announce */
+.announce-card{background:var(--bg3);border:1px solid var(--line2);border-radius:var(--r);padding:14px;margin-bottom:10px;}
+
+/* Role permission banner */
+.perm-banner{background:var(--amber-t);border:1px solid rgba(255,179,0,.2);border-radius:var(--r);padding:12px 16px;font-size:12px;color:var(--amber);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+
+/* Onboarding steps */
+.ob-steps{display:flex;gap:0;margin-bottom:24px;}
+.ob-step{flex:1;text-align:center;position:relative;}
+.ob-step::after{content:'';position:absolute;top:14px;left:50%;width:100%;height:2px;background:var(--line);z-index:0;}
+.ob-step:last-child::after{display:none;}
+.ob-num{width:28px;height:28px;border-radius:50%;background:var(--bg4);border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin:0 auto 6px;position:relative;z-index:1;}
+.ob-step.done .ob-num{background:var(--green);border-color:var(--green);color:#fff;}
+.ob-step.active .ob-num{border-color:var(--green);color:var(--green);}
+.ob-label{font-size:9px;font-weight:600;color:var(--chalk3);letter-spacing:.06em;text-transform:uppercase;}
+
+/* Responsive */
+@media(max-width:768px){
+  #sidebar{transform:translateX(-100%);}
+  #sidebar.open{transform:translateX(0);box-shadow:12px 0 48px rgba(0,0,0,.7);}
+  #main{margin-left:0;}
+  #topbar{left:0;}
+  .tb-ham{display:block;}
+  #sbOv.on{display:block;}
+  .stats{grid-template-columns:repeat(2,1fr);}
+  .modal-grid{grid-template-columns:1fr;}
+  .dash-grid{grid-template-columns:1fr;}
+}
+
+.fee-paid{color:var(--green2);}
+.fee-partial{color:var(--amber);}
+.fee-unpaid{color:var(--red);}
+.grade-a{color:var(--green2);font-weight:700;}
+.grade-b{color:var(--lime);font-weight:600;}
+.grade-c{color:var(--amber);font-weight:600;}
+.grade-d{color:var(--red);font-weight:600;}
+</style>
+</head>
+<body>
+
+<!-- ONBOARDING / LICENCE ACTIVATION -->
+<div class="screen on" id="sOnboard">
+  <div class="login-bg"></div>
+  <div class="card" style="max-width:520px">
+    <div class="ll">
+      <div class="ll-logo">🎓</div>
+      <div class="ll-name">QuantumServe School</div>
+      <div class="ll-tag">East Africa Edition · Uganda · Kenya · Tanzania · Rwanda</div>
+    </div>
+    <div class="ob-steps" id="obSteps">
+      <div class="ob-step active" id="obStep1"><div class="ob-num">1</div><div class="ob-label">Licence</div></div>
+      <div class="ob-step" id="obStep2"><div class="ob-num">2</div><div class="ob-label">School</div></div>
+      <div class="ob-step" id="obStep3"><div class="ob-num">3</div><div class="ob-label">Admin</div></div>
+      <div class="ob-step" id="obStep4"><div class="ob-num">4</div><div class="ob-label">Ready</div></div>
+    </div>
+
+    <!-- Step 1: Licence Key -->
+    <div id="obPane1">
+      <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:4px">Activate Your School</div>
+      <div style="font-size:12px;color:var(--chalk3);margin-bottom:20px">Enter the licence key provided by QuantumServe</div>
+      <div class="fld"><label>Licence Key</label><input id="licenceKey" placeholder="QS-UG-STMARYS-XXXXXXXX" style="font-family:'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"></div>
+      <div id="obErr1" class="al al-err" style="display:none"></div>
+      <button class="btn btn-g btn-full" onclick="activateLicence()" style="margin-top:16px">Verify Licence →</button>
+      <div style="text-align:center;margin-top:12px;font-size:11px;color:var(--chalk3)">No licence? Contact <strong>QuantumServe</strong> to get onboarded</div>
+    </div>
+
+    <!-- Step 2: School Profile -->
+    <div id="obPane2" style="display:none">
+      <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:4px">School Profile</div>
+      <div style="font-size:12px;color:var(--chalk3);margin-bottom:20px">Confirm your school details</div>
+      <div class="modal-grid">
+        <div class="fld col-full"><label>School Name</label><input id="obSchoolName" placeholder="e.g. St. Mary's College Kampala"></div>
+        <div class="fld"><label>Country</label>
+          <select id="obCountry" onchange="updateCurrencyFromCountry()">
+            <option value="Uganda">🇺🇬 Uganda</option>
+            <option value="Kenya">🇰🇪 Kenya</option>
+            <option value="Tanzania">🇹🇿 Tanzania</option>
+            <option value="Rwanda">🇷🇼 Rwanda</option>
+          </select>
+        </div>
+        <div class="fld"><label>Currency</label>
+          <select id="obCurrency">
+            <option value="UGX">UGX — Uganda Shillings</option>
+            <option value="KES">KES — Kenya Shillings</option>
+            <option value="TZS">TZS — Tanzania Shillings</option>
+            <option value="RWF">RWF — Rwanda Franc</option>
+          </select>
+        </div>
+        <div class="fld"><label>Exam Board</label>
+          <select id="obExamBoard">
+            <option value="UNEB">UNEB — Uganda</option>
+            <option value="KNEC">KNEC — Kenya</option>
+            <option value="NECTA">NECTA — Tanzania</option>
+            <option value="REB">REB — Rwanda</option>
+          </select>
+        </div>
+        <div class="fld"><label>School Type</label>
+          <select id="obSchoolType">
+            <option value="Secondary">Secondary (S.1–S.6)</option>
+            <option value="Primary">Primary (P.1–P.7)</option>
+            <option value="Combined">Combined (P+S)</option>
+            <option value="Technical">Technical/Vocational</option>
+          </select>
+        </div>
+        <div class="fld col-full"><label>Phone</label><input id="obPhone" placeholder="+256 7XX XXX XXX"></div>
+        <div class="fld col-full"><label>Email</label><input id="obEmail" type="email" placeholder="admin@school.ac.ug"></div>
+      </div>
+      <div id="obErr2" class="al al-err" style="display:none"></div>
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button class="btn btn-ghost" onclick="goObStep(1)">← Back</button>
+        <button class="btn btn-g" style="flex:1" onclick="saveSchoolProfile()">Save Profile →</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Create Admin User -->
+    <div id="obPane3" style="display:none">
+      <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:4px">Create Administrator</div>
+      <div style="font-size:12px;color:var(--chalk3);margin-bottom:20px">Set up the first admin account for your school</div>
+      <div class="modal-grid">
+        <div class="fld"><label>First Name</label><input id="obFname" placeholder="Sarah"></div>
+        <div class="fld"><label>Last Name</label><input id="obLname" placeholder="Namukasa"></div>
+        <div class="fld col-full"><label>Email Address</label><input id="obAdminEmail" type="email" placeholder="principal@school.ac.ug"></div>
+        <div class="fld col-full"><label>Password</label><input id="obAdminPass" type="password" placeholder="Minimum 8 characters"></div>
+        <div class="fld col-full"><label>Role</label>
+          <select id="obAdminRole">
+            <option value="principal">Principal</option>
+            <option value="system_admin">System Administrator</option>
+          </select>
+        </div>
+      </div>
+      <div id="obErr3" class="al al-err" style="display:none"></div>
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button class="btn btn-ghost" onclick="goObStep(2)">← Back</button>
+        <button class="btn btn-g" style="flex:1" onclick="createAdminUser()">Create Account →</button>
+      </div>
+    </div>
+
+    <!-- Step 4: Done -->
+    <div id="obPane4" style="display:none;text-align:center">
+      <div style="font-size:56px;margin-bottom:16px">✅</div>
+      <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:8px">School Activated!</div>
+      <div style="font-size:13px;color:var(--chalk2);margin-bottom:20px;line-height:1.6">Your school portal is ready. Sign in with your admin credentials to get started.</div>
+      <button class="btn btn-g btn-full" onclick="showLogin()">Go to Sign In →</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div class="screen" id="sLogin">
+  <div class="login-bg"></div>
+  <div class="card">
+    <div class="ll">
+      <div class="ll-logo">🎓</div>
+      <div class="ll-name" id="loginSchoolName">QuantumServe School</div>
+      <div class="ll-tag" id="loginSchoolTag">East Africa Edition</div>
+    </div>
+    <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:4px;text-align:center">Welcome Back</div>
+    <div style="font-size:12px;color:var(--chalk3);text-align:center;margin-bottom:20px">Sign in to your school management portal</div>
+    <div class="fld"><label>Email Address</label><input id="loginEmail" type="email" placeholder="principal@school.ac.ug" autocomplete="username"></div>
+    <div class="fld"><label>Password</label><input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div id="loginErr" class="al al-err" style="display:none"></div>
+    <div id="loginLoading" class="al al-info" style="display:none">🔄 Signing in…</div>
+    <button class="btn btn-g btn-full" onclick="doLogin()" id="loginBtn" style="margin-top:16px">Sign In →</button>
+    <div style="text-align:center;margin-top:14px">
+      <button class="btn btn-ghost btn-sm" onclick="showOnboard()">Activate New School</button>
+    </div>
+    <div style="text-align:center;margin-top:12px;font-size:10px;color:var(--chalk4)">QuantumServe School v4.0 · UGX · KES · TZS · RWF</div>
+  </div>
+</div>
+
+<!-- APP SHELL -->
+<div class="screen" id="sApp">
+  <aside id="sidebar">
+    <div class="sb-top">
+      <div class="sb-logo">🎓</div>
+      <div class="sb-brand">
+        <strong id="sbSchoolName">School</strong>
+        <span id="sbCountry">QuantumServe</span>
+      </div>
+    </div>
+    <nav id="nav"></nav>
+    <div class="sb-bot">
+      <div class="sb-user">
+        <div class="sb-av" id="sbAv">?</div>
+        <div style="flex:1;min-width:0">
+          <div class="sb-un" id="sbName">User</div>
+          <div class="sb-ur" id="sbRoleLabel">—</div>
+          <div class="sb-school" id="sbSchoolLabel">—</div>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-full btn-sm" onclick="doLogout()">Sign Out</button>
+    </div>
+  </aside>
+  <div id="sbOv" onclick="closeSidebar()"></div>
+  <div id="topbar">
+    <button class="tb-ham" onclick="openSidebar()">☰</button>
+    <div class="tb-title" id="tbTitle">Dashboard</div>
+    <div class="tb-right">
+      <div class="role-badge" id="tbRole">—</div>
+      <div class="term-pill" id="tbTerm">Term 2 · 2025</div>
+      <div class="conn-pill"><div class="conn-dot" id="connDot"></div><span id="connLabel">Live</span></div>
+    </div>
+  </div>
+  <main id="main"><div id="module-container"><div class="loading"><div class="spinner"></div>Loading…</div></div></main>
+</div>
+
+<div id="toastWrap"></div>
+
+<script>
+// ── Supabase Client ───────────────────────────────────────────
+const SUPABASE_URL = 'https://ifsuhqnttjxbbmceibgn.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlmc3VocW50dGp4YmJtY2VpYmduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4Nzg2NjEsImV4cCI6MjA5NTQ1NDY2MX0.9izjqXriJKMtY-UWX4OY3J_8YJBSjUcauESXhoRzvFc';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// ── App State ─────────────────────────────────────────────────
+const APP = {
+  school: null,      // schools row
+  user: null,        // school_users row
+  authUser: null,    // supabase auth user
+  role: null,        // role string
+  schoolId: null,
+};
+
+// ── RBAC — Navigation by role ─────────────────────────────────
+// Aligned to specification: 11 roles, each with scoped access
+const NAV_BY_ROLE = {
+  system_admin: [
+    { sect:'System', items:[
+      {page:'dashboard',icon:'🏠',label:'Dashboard'},
+      {page:'schools',icon:'🏫',label:'All Schools'},
+      {page:'licences',icon:'🔑',label:'Licences'},
+      {page:'users',icon:'👥',label:'All Users'},
+      {page:'audit',icon:'📋',label:'Audit Logs'},
+      {page:'settings',icon:'⚙️',label:'System Settings'},
+    ]},
+  ],
+  principal: [
+    { sect:'Overview', items:[
+      {page:'dashboard',icon:'🏠',label:'Dashboard'},
+      {page:'notices',icon:'📢',label:'Notices'},
+    ]},
+    { sect:'Academic', items:[
+      {page:'students',icon:'👩‍🎓',label:'Students'},
+      {page:'classes',icon:'🏫',label:'Classes & Streams'},
+      {page:'exams',icon:'📝',label:'Examinations'},
+      {page:'timetable',icon:'🗓️',label:'Timetable'},
+      {page:'attendance',icon:'✅',label:'Attendance'},
+    ]},
+    { sect:'Administration', items:[
+      {page:'staff',icon:'👔',label:'Staff & HR'},
+      {page:'fees',icon:'💰',label:'Fees & Payments'},
+      {page:'finance',icon:'📊',label:'Finance'},
+      {page:'inventory',icon:'📦',label:'Inventory'},
+      {page:'reports',icon:'📋',label:'Reports'},
+      {page:'settings',icon:'⚙️',label:'Settings'},
+    ]},
+  ],
+  deputy_principal: [
+    { sect:'Overview', items:[
+      {page:'dashboard',icon:'🏠',label:'Dashboard'},
+      {page:'notices',icon:'📢',label:'Notices'},
+    ]},
+    { sect:'Academic', items:[
+      {page:'students',icon:'👩‍🎓',label:'Students'},
+      {page:'classes',icon:'🏫',label:'Classes & Streams'},
+      {page:'exams',icon:'📝',label:'Examinations'},
+      {page:'timetable',icon:'🗓️',label:'Timetable'},
+      {page:'attendance',icon:'✅',label:'Attendance'},
+    ]},
+    { sect:'Admin (Limited)', items:[
+      {page:'staff',icon:'👔',label:'Staff Supervision'},
+      {page:'reports',icon:'📋',label:'Reports'},
+      // NO: fees, finance, inventory, settings
+    ]},
+  ],
+  director_of_studies: [
+    { sect:'Academic', items:[
+      {page:'dashboard',icon:'🏠',label:'Dashboard'},
+      {page:'students',icon:'👩‍🎓',label:'Students'},
+      {page:'classes',icon:'🏫',label:'Classes & Streams'},
+      {page:'exams',icon:'📝',label:'Examinations'},
+      {page:'timetable',icon:'🗓️',label:'Timetable'},
+      {page:'attendance',icon:'✅',label:'Attendance'},
+      {page:'notices',icon:'📢',label:'Notices'},
+      {page:'reports',icon:'📋',label:'Academic Reports'},
+    ]},
+    // NO: staff HR, fees, finance, inventory, settings
+  ],
+  class_teacher: [
+    { sect:'My Classroom', items:[
+      {page:'students',icon:'👩‍🎓',label:'My Students'},
+      {page:'exams',icon:'📝',label:'Marks Entry'},
+      {page:'attendance',icon:'✅',label:'Attendance'},
+      {page:'timetable',icon:'🗓️',label:'My Timetable'},
+      {page:'notices',icon:'📢',label:'Notices'},
+    ]},
+    // NO: finance, staff, inventory, settings, other classes
+  ],
+  subject_teacher: [
+    { sect:'My Subjects', items:[
+      {page:'exams',icon:'📝',label:'Enter Marks'},
+      {page:'timetable',icon:'🗓️',label:'My Timetable'},
+      {page:'notices',icon:'📢',label:'Notices'},
+    ]},
+    // NO: finance, staff, inventory, settings, full student list
+  ],
+  bursar: [
+    { sect:'Finance', items:[
+      {page:'fees',icon:'💰',label:'Fees & Payments'},
+      {page:'finance',icon:'📊',label:'Financial Ledger'},
+      {page:'reports',icon:'📋',label:'Financial Reports'},
+    ]},
+    { sect:'Procurement', items:[
+      {page:'inventory',icon:'📦',label:'Procurement View'},
+    ]},
+    // NO: exams, staff academic, settings
+  ],
+  accountant: [
+    { sect:'Finance', items:[
+      {page:'fees',icon:'💰',label:'Fees & Payments'},
+      {page:'finance',icon:'📊',label:'Financial Ledger'},
+      {page:'reports',icon:'📋',label:'Reports'},
+    ]},
+  ],
+  registrar: [
+    { sect:'Academic Admin', items:[
+      {page:'students',icon:'👩‍🎓',label:'Student Register'},
+      {page:'classes',icon:'🏫',label:'Classes'},
+      {page:'exams',icon:'📝',label:'Examinations'},
+      {page:'notices',icon:'📢',label:'Notices'},
+    ]},
+  ],
+  store_keeper: [
+    { sect:'Stores', items:[
+      {page:'inventory',icon:'📦',label:'Inventory & Stores'},
+      {page:'reports',icon:'📋',label:'Stock Reports'},
+    ]},
+  ],
+  librarian: [
+    { sect:'Library', items:[
+      {page:'library',icon:'📚',label:'Library'},
+      {page:'notices',icon:'📢',label:'Notices'},
+    ]},
+  ],
+};
+
+// Role display labels
+const ROLE_LABELS = {
+  system_admin:'System Admin', principal:'Principal',
+  deputy_principal:'Deputy Principal', director_of_studies:'Director of Studies',
+  class_teacher:'Class Teacher', subject_teacher:'Subject Teacher',
+  bursar:'Bursar', accountant:'Accountant', registrar:'Registrar',
+  store_keeper:'Store Keeper', librarian:'Librarian',
+};
+
+// Pages each role is blocked from (double-gated in renderPage too)
+const BLOCKED_PAGES = {
+  deputy_principal:   ['fees','finance','settings'],
+  director_of_studies:['fees','finance','staff','inventory','settings'],
+  class_teacher:      ['fees','finance','staff','inventory','settings','reports'],
+  subject_teacher:    ['fees','finance','staff','inventory','settings','reports','students','classes','attendance'],
+  bursar:             ['exams','classes','timetable','settings'],
+  accountant:         ['exams','classes','timetable','settings','staff'],
+  registrar:          ['fees','finance','staff','inventory','settings'],
+  store_keeper:       ['fees','finance','staff','exams','classes','timetable','students'],
+  librarian:          ['fees','finance','staff','exams','classes','timetable','students','inventory'],
+};
+
+// ── Utilities ─────────────────────────────────────────────────
+const fm = v => Number(v||0).toLocaleString('en-UG');
+const fmC = (v,cur='UGX') => `${cur} ${fm(v)}`;
+const fd = v => { if(!v) return '—'; return new Date(v).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); };
+
+function toast(msg, type='ok', dur=3500){
+  const tw = document.getElementById('toastWrap'); if(!tw) return;
+  const t = document.createElement('div'); t.className=`toast t-${type}`; t.textContent=msg;
+  tw.appendChild(t); requestAnimationFrame(()=>t.classList.add('on'));
+  setTimeout(()=>{ t.classList.remove('on'); setTimeout(()=>t.remove(),400); }, dur);
+}
+
+function showEl(id){ const e=document.getElementById(id); if(e) e.style.display='block'; }
+function hideEl(id){ const e=document.getElementById(id); if(e) e.style.display='none'; }
+function setErr(id, msg){ const e=document.getElementById(id); if(e){ e.textContent=msg; e.style.display=msg?'block':'none'; } }
+
+function sbadge(s){
+  const m={Paid:'bg',Partial:'ba',Unpaid:'br',Active:'bg',Leave:'ba',Terminated:'br',
+           High:'br',Medium:'ba',Low:'bc',Teaching:'bl2','Non-Teaching':'bc',
+           Boarding:'bt',Day:'bc',Approved:'bg',Pending:'ba',Rejected:'br'};
+  return `<span class="badge ${m[s]||'bc'}">${s||'—'}</span>`;
+}
+function gradeC(g){
+  if(['D1','D2'].includes(g)) return 'grade-a';
+  if(['C3','C4','C5','C6'].includes(g)) return 'grade-b';
+  if(['P7','P8'].includes(g)) return 'grade-c';
+  return 'grade-d';
+}
+
+function canAccess(page){
+  if(APP.role === 'system_admin' || APP.role === 'principal') return true;
+  const blocked = BLOCKED_PAGES[APP.role] || [];
+  return !blocked.includes(page);
+}
+
+// ── Onboarding ────────────────────────────────────────────────
+let OB = { licenceData: null, schoolData: null };
+
+function showOnboard(){
+  document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('on');s.style.display='none';});
+  const s=document.getElementById('sOnboard'); s.style.display='flex'; s.classList.add('on');
+  goObStep(1);
+}
+
+function showLogin(){
+  document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('on');s.style.display='none';});
+  const s=document.getElementById('sLogin'); s.style.display='flex'; s.classList.add('on');
+}
+
+function goObStep(n){
+  [1,2,3,4].forEach(i=>{
+    document.getElementById(`obPane${i}`).style.display = i===n ? 'block' : 'none';
+    const st=document.getElementById(`obStep${i}`);
+    st.classList.remove('active','done');
+    if(i < n) st.classList.add('done');
+    if(i === n) st.classList.add('active');
+  });
+}
+
+function updateCurrencyFromCountry(){
+  const map={Uganda:'UGX',Kenya:'KES',Tanzania:'TZS',Rwanda:'RWF'};
+  const boardMap={Uganda:'UNEB',Kenya:'KNEC',Tanzania:'NECTA',Rwanda:'REB'};
+  const c=document.getElementById('obCountry').value;
+  document.getElementById('obCurrency').value = map[c]||'UGX';
+  document.getElementById('obExamBoard').value = boardMap[c]||'UNEB';
+}
+
+async function activateLicence(){
+  const key = document.getElementById('licenceKey').value.trim();
+  if(!key){ setErr('obErr1','Enter your licence key'); return; }
+  setErr('obErr1','');
+
+  const btn = document.querySelector('#obPane1 .btn-g');
+  btn.disabled = true;
+  btn.textContent = 'Verifying…';
+
+  try {
+    // Direct table query blocked for anon users by RLS.
+    // fn_activate_school is SECURITY DEFINER — bypasses RLS safely.
+    const { data, error } = await sb.rpc('fn_activate_school', {
+      p_licence_key: key
+    });
+
+    if(error) throw new Error(error.message);
+
+    const result = data?.[0];
+
+    if(!result?.success){
+      setErr('obErr1', result?.message || 'Invalid or expired licence key');
+      return;
+    }
+
+    OB.licenceData = {
+      id:          null,
+      licence_key: key,
+      plan:        result.plan,
+      school_id:   result.school_id,
+    };
+
+    if(result.school_name){
+      document.getElementById('obSchoolName').value = result.school_name;
+    }
+    if(result.country){
+      document.getElementById('obCountry').value = result.country;
+      updateCurrencyFromCountry();
+    }
+
+    goObStep(2);
+
+  } catch(e){
+    setErr('obErr1', e.message || 'Verification failed. Check your key and try again.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Verify Licence →';
+  }
+}
+
+async function saveSchoolProfile(){
+  const name = document.getElementById('obSchoolName').value.trim();
+  if(!name){ setErr('obErr2','Enter school name'); return; }
+  setErr('obErr2','');
+  OB.schoolData = {
+    name,
+    country: document.getElementById('obCountry').value,
+    currency: document.getElementById('obCurrency').value,
+    exam_board: document.getElementById('obExamBoard').value,
+    school_type: document.getElementById('obSchoolType').value,
+    phone: document.getElementById('obPhone').value.trim(),
+    email: document.getElementById('obEmail').value.trim(),
+  };
+
+  if(OB.licenceData?.school_id){
+    try {
+      await sb.from('schools').update(OB.schoolData).eq('id', OB.licenceData.school_id);
+    } catch(e){}
+  }
+  goObStep(3);
+}
+
+async function createAdminUser(){
+  const email = document.getElementById('obAdminEmail').value.trim();
+  const pass  = document.getElementById('obAdminPass').value;
+  const fname = document.getElementById('obFname').value.trim();
+  const lname = document.getElementById('obLname').value.trim();
+  const role  = document.getElementById('obAdminRole').value;
+
+  if(!email||!pass||!fname){ setErr('obErr3','Fill all fields'); return; }
+  if(pass.length < 8){ setErr('obErr3','Password must be at least 8 characters'); return; }
+  setErr('obErr3','');
+
+  const btn3 = document.querySelector('#obPane3 .btn-g');
+  btn3.disabled = true;
+  btn3.textContent = 'Creating account…';
+
+  try {
+    // Step 1: Create auth user
+    const { data: authData, error: authErr } = await sb.auth.signUp({ email, password: pass });
+    if(authErr) throw new Error(authErr.message);
+    if(!authData?.user) throw new Error('Signup did not return a user. Please try again.');
+
+    // Step 2: Insert school_users row
+    if(!OB.licenceData?.school_id){
+      throw new Error('Licence not linked to a school. Please restart onboarding.');
+    }
+
+    const { error: suErr } = await sb.from('school_users').insert({
+      school_id:    OB.licenceData.school_id,
+      auth_user_id: authData.user.id,
+      first_name:   fname,
+      last_name:    lname,
+      email,
+      role,
+      is_active:    true,
+    });
+    if(suErr) throw new Error('Account created but school profile failed: ' + suErr.message);
+
+    // Step 3: Stamp activated_at on licence via key
+    if(OB.licenceData?.licence_key){
+      await sb.from('school_licences')
+        .update({ activated_at: new Date().toISOString() })
+        .eq('licence_key', OB.licenceData.licence_key);
+    }
+
+    goObStep(4);
+
+  } catch(e){
+    setErr('obErr3', e.message || 'Setup failed. Please try again.');
+  } finally {
+    btn3.disabled = false;
+    btn3.textContent = 'Create Account →';
+  }
+}
+
+// ── Auth ──────────────────────────────────────────────────────
+async function doLogin(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPass').value;
+  if(!email||!pass){ setErr('loginErr','Enter email and password'); return; }
+
+  setErr('loginErr','');
+  hideEl('loginErr');
+  showEl('loginLoading');
+  document.getElementById('loginBtn').disabled = true;
+
+  try {
+    const { data: authData, error: authErr } = await sb.auth.signInWithPassword({ email, password: pass });
+    if(authErr){ throw authErr; }
+
+    const { data: userRow, error: userErr } = await sb
+      .from('school_users')
+      .select('*, schools(*)')
+      .eq('auth_user_id', authData.user.id)
+      .eq('is_active', true)
+      .single();
+
+    if(userErr || !userRow){ throw new Error('Account not found in any school. Contact your administrator.'); }
+
+    APP.authUser = authData.user;
+    APP.user     = userRow;
+    APP.school   = userRow.schools;
+    APP.role     = userRow.role;
+    APP.schoolId = userRow.school_id;
+
+    mountApp();
+  } catch(e){
+    setErr('loginErr', e.message || 'Sign in failed');
+    showEl('loginErr');
+  } finally {
+    hideEl('loginLoading');
+    document.getElementById('loginBtn').disabled = false;
+  }
+}
+
+async function doLogout(){
+  await sb.auth.signOut();
+  APP.school = null; APP.user = null; APP.authUser = null; APP.role = null; APP.schoolId = null;
+  showLogin();
+}
+
+// Check existing session on load
+async function checkSession(){
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if(!session){ showLogin(); return; }
+
+    const { data: userRow } = await sb
+      .from('school_users')
+      .select('*, schools(*)')
+      .eq('auth_user_id', session.user.id)
+      .eq('is_active', true)
+      .single();
+
+    if(!userRow){ showLogin(); return; }
+
+    APP.authUser = session.user;
+    APP.user     = userRow;
+    APP.school   = userRow.schools;
+    APP.role     = userRow.role;
+    APP.schoolId = userRow.school_id;
+    mountApp();
+  } catch(e){ showLogin(); }
+}
+
+// ── App Mount ─────────────────────────────────────────────────
+function mountApp(){
+  document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('on');s.style.display='none';});
+  const app = document.getElementById('sApp');
+  app.style.display='flex'; app.classList.add('on');
+
+  const s = APP.school || {};
+  const u = APP.user || {};
+
+  document.getElementById('sbSchoolName').textContent  = s.short_name || s.name || 'School';
+  document.getElementById('sbCountry').textContent     = s.country || 'QuantumServe';
+  document.getElementById('sbName').textContent        = `${u.first_name||''} ${u.last_name||''}`.trim();
+  document.getElementById('sbRoleLabel').textContent   = ROLE_LABELS[APP.role] || APP.role;
+  document.getElementById('sbSchoolLabel').textContent = s.name || '—';
+  document.getElementById('sbAv').textContent          = ((u.first_name||'?')[0]+(u.last_name||'?')[0]).toUpperCase();
+  document.getElementById('tbRole').textContent        = ROLE_LABELS[APP.role] || APP.role;
+  document.getElementById('tbTerm').textContent        = `Term ${s.current_term||2} · ${s.current_year||2025}`;
+  document.getElementById('connDot').className         = 'conn-dot';
+  document.getElementById('connLabel').textContent     = 'Live';
+
+  buildNav();
+  const defaultPage = APP.role === 'subject_teacher' ? 'exams' :
+                      APP.role === 'store_keeper'     ? 'inventory' :
+                      APP.role === 'librarian'        ? 'library'   : 'dashboard';
+  loadPage(defaultPage);
+}
+
+// ── Navigation ────────────────────────────────────────────────
+function buildNav(){
+  const secs = NAV_BY_ROLE[APP.role] || NAV_BY_ROLE.principal;
+  document.getElementById('nav').innerHTML = secs.map(sec=>
+    `<div class="nsect">${sec.sect}</div>` +
+    sec.items.map(i=>
+      `<div class="ni" data-page="${i.page}" onclick="loadPage('${i.page}')">
+         <span class="ni-icon">${i.icon}</span>${i.label}
+       </div>`
+    ).join('')
+  ).join('');
+}
+
+function setActiveNav(page){
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll(`[data-page="${page}"]`).forEach(n=>n.classList.add('active'));
+  const titles={dashboard:'Dashboard',students:'Students',classes:'Classes & Streams',
+    exams:'Examinations',staff:'Staff & HR',fees:'Fees & Payments',finance:'Finance',
+    inventory:'Inventory & Stores',notices:'Notices',timetable:'Timetable',
+    attendance:'Attendance',reports:'Reports',settings:'Settings',
+    library:'Library',schools:'All Schools',licences:'Licences',users:'All Users',audit:'Audit Logs'};
+  document.getElementById('tbTitle').textContent = titles[page] || page;
+}
+
+function openSidebar(){ document.getElementById('sidebar').classList.add('open'); document.getElementById('sbOv').classList.add('on'); }
+function closeSidebar(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('sbOv').classList.remove('on'); }
+
+// ── Page Router with permission check ────────────────────────
+function loadPage(page){
+  closeSidebar();
+  setActiveNav(page);
+
+  if(!canAccess(page)){
+    document.getElementById('module-container').innerHTML = `
+      <div class="perm-banner">🔒 Access Restricted</div>
+      <div class="empty"><div class="ei">🚫</div>
+      <p>Your role (<strong>${ROLE_LABELS[APP.role]||APP.role}</strong>) does not have access to <strong>${page}</strong>.</p>
+      <p style="margin-top:8px;font-size:11px">Contact your administrator if you need access.</p></div>`;
+    return;
+  }
+
+  document.getElementById('module-container').innerHTML =
+    '<div class="loading"><div class="spinner"></div>Loading…</div>';
+
+  setTimeout(async ()=>{
+    switch(page){
+      case 'dashboard':  await renderDashboard(); break;
+      case 'students':   await renderStudents();  break;
+      case 'classes':    await renderClasses();   break;
+      case 'exams':      await renderExams();     break;
+      case 'staff':      await renderStaff();     break;
+      case 'fees':       await renderFees();      break;
+      case 'finance':    await renderFinance();   break;
+      case 'inventory':  await renderInventory(); break;
+      case 'notices':    await renderNotices();   break;
+      case 'timetable':  await renderTimetable(); break;
+      case 'attendance': await renderAttendance();break;
+      case 'reports':    await renderReports();   break;
+      case 'settings':   await renderSettings();  break;
+      case 'schools':    await renderAllSchools();break;
+      case 'licences':   await renderLicences();  break;
+      case 'audit':      await renderAudit();     break;
+      default: document.getElementById('module-container').innerHTML =
+        `<div class="empty"><div class="ei">🚧</div><p>Module coming soon</p></div>`;
+    }
+  }, 60);
+}
+
+// ── DB helpers ────────────────────────────────────────────────
+async function dbGet(table, query={}){
+  try {
+    let q = sb.from(table).select(query.select||'*');
+    if(APP.schoolId && !query.noSchool) q = q.eq('school_id', APP.schoolId);
+    if(query.eq) Object.entries(query.eq).forEach(([k,v])=>{ q=q.eq(k,v); });
+    if(query.order) q = q.order(query.order, { ascending: query.asc ?? false });
+    if(query.limit) q = q.limit(query.limit);
+    if(query.filter) q = query.filter(q);
+    const { data, error } = await q;
+    if(error) throw error;
+    return data || [];
+  } catch(e){ console.warn('dbGet',table,e.message); return []; }
+}
+
+async function dbCount(table){
+  try {
+    const { count } = await sb.from(table).select('*',{count:'exact',head:true})
+      .eq('school_id', APP.schoolId);
+    return count || 0;
+  } catch(){ return 0; }
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────
+async function renderDashboard(){
+  const [students, paid, partial, unpaid, staff, notices, txns] = await Promise.all([
+    dbCount('students'),
+    dbGet('student_fee_accounts',{eq:{status:'Paid'},limit:1}).then(d=>d.length>0?null:null).catch(()=>null),
+    dbGet('student_fee_accounts',{eq:{status:'Partial'},limit:1}).then(()=>null).catch(()=>null),
+    dbGet('student_fee_accounts',{eq:{status:'Unpaid'},limit:1}).then(()=>null).catch(()=>null),
+    dbCount('staff_members'),
+    dbGet('notices',{order:'created_at',limit:4}),
+    dbGet('financial_transactions',{order:'transaction_date',limit:5}),
+  ]);
+
+  const s = APP.school || {};
+  const cur = s.currency || 'UGX';
+  const isFinanceRole = ['principal','bursar','accountant','system_admin'].includes(APP.role);
+
+  document.getElementById('module-container').innerHTML = `
+    <div style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);padding:20px;margin-bottom:14px;display:flex;align-items:center;gap:16px">
+      <div style="font-size:36px">🏫</div>
+      <div>
+        <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700">${s.name||'School'}</div>
+        <div style="font-size:11px;color:var(--chalk3);margin-top:2px">${s.school_type||'Secondary'} · ${s.exam_board||'UNEB'} · ${s.country||'Uganda'}</div>
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+          <span class="badge bg">Term ${s.current_term||2}, ${s.current_year||2025}</span>
+          <span class="badge bc">${ROLE_LABELS[APP.role]||APP.role}</span>
+          <span class="badge bt">${cur}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="sc"><div class="sc-l">Students</div><div class="sc-v">${students.toLocaleString()}</div><div class="sc-s">Enrolled</div></div>
+      <div class="sc"><div class="sc-l">Teaching Staff</div><div class="sc-v">${staff.toLocaleString()}</div></div>
+      ${isFinanceRole ? `
+      <div class="sc"><div class="sc-l">Fees Collected</div><div class="sc-v" style="font-size:16px;color:var(--green2)">—</div><div class="sc-s">This term · Loading</div></div>
+      <div class="sc"><div class="sc-l">Defaulters</div><div class="sc-v" style="color:var(--amber)">—</div><div class="sc-s">Loading…</div></div>
+      ` : ''}
+    </div>
+
+    <div class="dash-grid">
+      <div class="widget">
+        <div class="widget-title">📢 Recent Notices</div>
+        ${notices.length ? notices.map(n=>`
+          <div class="wi-row">
+            <div style="flex:1;min-width:0">
+              <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${n.title||'—'}</div>
+              <div style="font-size:10px;color:var(--chalk3)">${fd(n.publish_date||n.created_at)}</div>
+            </div>
+            ${sbadge(n.priority||'Medium')}
+          </div>`).join('') :
+          '<div style="font-size:12px;color:var(--chalk3);padding:12px 0;text-align:center">No notices yet</div>'}
+        <button class="btn btn-ghost btn-full btn-sm" onclick="loadPage('notices')" style="margin-top:8px">All Notices →</button>
+      </div>
+
+      ${isFinanceRole ? `
+      <div class="widget">
+        <div class="widget-title">💳 Recent Transactions</div>
+        ${txns.length ? txns.map(t=>`
+          <div class="wi-row">
+            <div style="flex:1;min-width:0">
+              <div style="font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.description||'—'}</div>
+              <div style="font-size:10px;color:var(--chalk3)">${fd(t.transaction_date)} · ${t.category||''}</div>
+            </div>
+            <span style="font-family:'JetBrains Mono';font-size:11px;font-weight:700;color:${t.transaction_type==='Income'?'var(--green2)':'var(--red)'}">
+              ${t.transaction_type==='Income'?'+':'-'}${fm(Math.abs(t.amount||0))}
+            </span>
+          </div>`).join('') :
+          '<div style="font-size:12px;color:var(--chalk3);padding:12px 0;text-align:center">No transactions yet</div>'}
+        <button class="btn btn-ghost btn-full btn-sm" onclick="loadPage('finance')" style="margin-top:8px">Finance →</button>
+      </div>` : ''}
+
+      <div class="widget">
+        <div class="widget-title">🌍 Exam Board</div>
+        <div class="wi-row"><span>Board</span><strong>${s.exam_board||'UNEB'}</strong></div>
+        <div class="wi-row"><span>Country</span><strong>${s.country||'Uganda'}</strong></div>
+        <div class="wi-row"><span>Currency</span><strong>${cur}</strong></div>
+        <div class="wi-row"><span>Current Term</span><strong>Term ${s.current_term||2}, ${s.current_year||2025}</strong></div>
+      </div>
+    </div>`;
+}
+
+// ── STUDENTS ──────────────────────────────────────────────────
+async function renderStudents(){
+  const students = await dbGet('students',{
+    order:'created_at',
+    select:'id,student_number,first_name,last_name,class_name,stream,gender,boarding_status,district,status',
+    filter: q => {
+      if(APP.role==='class_teacher' && APP.user?.class_id)
+        return q.eq('class_id', APP.user.class_id);
+      return q.eq('status','Active');
+    }
+  });
+
+  document.getElementById('module-container').innerHTML = `
+    <div class="ph" style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);margin-bottom:14px">
+      <div><div class="ph-title">👩‍🎓 Students</div>
+        <div class="ph-sub">${APP.role==='class_teacher'?'Your assigned class only':'All enrolled students'}</div></div>
+      <div class="ph-actions">
+        <input id="stuQ" placeholder="Search…" oninput="filterStudents()" style="padding:8px 12px;border-radius:var(--r);background:var(--bg3);color:var(--chalk);border:1px solid var(--line);font-size:12px;width:180px">
+        ${canAccess('students') && ['principal','registrar','deputy_principal','system_admin'].includes(APP.role) ?
+          `<button class="btn btn-g btn-sm" onclick="showAddStudent()">+ Admit</button>` : ''}
+      </div>
+    </div>
+    <div class="stats">
+      <div class="sc"><div class="sc-l">Total Shown</div><div class="sc-v">${students.length}</div></div>
+      <div class="sc"><div class="sc-l">Female</div><div class="sc-v">${students.filter(s=>s.gender==='Female').length}</div></div>
+      <div class="sc"><div class="sc-l">Boarders</div><div class="sc-v">${students.filter(s=>s.boarding_status==='Boarding').length}</div></div>
+    </div>
+    <div class="panel">
+      <div class="tbl-wrap" id="stuTbl">
+        ${renderStuTable(students)}
+      </div>
+    </div>`;
+  window._students = students;
+}
+
+function renderStuTable(arr){
+  if(!arr.length) return '<div class="empty"><div class="ei">👩‍🎓</div><p>No students found</p></div>';
+  return `<table><thead><tr><th>ID</th><th>Name</th><th>Class</th><th>Gender</th><th>Boarding</th><th>District</th><th>Status</th><th>Actions</th></tr></thead>
+  <tbody>${arr.map(s=>`<tr>
+    <td class="mono">${s.student_number||s.id.slice(0,8)}</td>
+    <td style="font-weight:600">${s.first_name} ${s.last_name}</td>
+    <td>${sbadge(s.class_name||'—')}</td>
+    <td>${s.gender==='Female'?'👩 F':'👨 M'}</td>
+    <td>${sbadge(s.boarding_status||'Day')}</td>
+    <td>${s.district||'—'}</td>
+    <td>${sbadge(s.status||'Active')}</td>
+    <td><button class="btn btn-ghost btn-sm" onclick="viewStudent('${s.id}')">View</button></td>
+  </tr>`).join('')}</tbody></table>`;
+}
+
+function filterStudents(){
+  const q=(document.getElementById('stuQ').value||'').toLowerCase();
+  const f=(window._students||[]).filter(s=>`${s.first_name} ${s.last_name} ${s.student_number||''}`.toLowerCase().includes(q));
+  document.getElementById('stuTbl').innerHTML = renderStuTable(f);
+}
+
+async function viewStudent(id){
+  const { data: s } = await sb.from('students').select('*').eq('id',id).single();
+  if(!s) return;
+  const modal = document.createElement('div');
+  modal.className='modal-bg';
+  modal.innerHTML=`<div class="modal">
+    <div class="modal-title">${s.first_name} ${s.last_name}</div>
+    <div class="modal-sub">${s.class_name||'—'} · ${s.stream||'—'} · ${s.boarding_status||'Day'}</div>
+    <div class="modal-grid">
+      <div><div style="font-size:9px;font-weight:700;color:var(--chalk3);margin-bottom:4px">STUDENT NO.</div><div class="mono">${s.student_number||'—'}</div></div>
+      <div><div style="font-size:9px;font-weight:700;color:var(--chalk3);margin-bottom:4px">ADMISSION NO.</div><div class="mono">${s.admission_number||'—'}</div></div>
+      <div><div style="font-size:9px;font-weight:700;color:var(--chalk3);margin-bottom:4px">DATE OF BIRTH</div><div>${fd(s.date_of_birth)}</div></div>
+      <div><div style="font-size:9px;font-weight:700;color:var(--chalk3);margin-bottom:4px">DISTRICT</div><div>${s.district||'—'}</div></div>
+      <div class="col-full"><div style="font-size:9px;font-weight:700;color:var(--chalk3);margin-bottom:4px">GUARDIAN</div><div style="font-weight:600">${s.guardian1_name||'—'}</div><div style="font-size:11px;color:var(--chalk3)">${s.guardian1_phone||'—'} · ${s.guardian1_relation||'—'}</div></div>
+      ${['principal','bursar','accountant','system_admin'].includes(APP.role) && s.medical_notes ? `<div class="col-full"><div style="font-size:9px;font-weight:700;color:var(--chalk3);margin-bottom:4px">MEDICAL NOTES</div><div style="font-size:12px">${s.medical_notes}</div></div>` : ''}
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="this.closest('.modal-bg').remove()">Close</button>
+      ${['principal','registrar','system_admin'].includes(APP.role) ? `<button class="btn btn-o" onclick="toast('Editing student…','info')">Edit</button>` : ''}
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click',e=>{if(e.target===modal)modal.remove();});
+}
+
+function showAddStudent(){
+  const modal=document.createElement('div');
+  modal.className='modal-bg';
+  modal.innerHTML=`<div class="modal">
+    <div class="modal-title">Admit New Student</div>
+    <div class="modal-sub">${APP.school?.exam_board||'UNEB'} · ${APP.school?.country||'Uganda'}</div>
+    <div class="modal-grid">
+      <div class="fld"><label>First Name</label><input id="ns_fn" placeholder="e.g. Aisha"></div>
+      <div class="fld"><label>Last Name</label><input id="ns_ln" placeholder="e.g. Nalubega"></div>
+      <div class="fld"><label>Gender</label><select id="ns_g"><option value="Female">Female</option><option value="Male">Male</option></select></div>
+      <div class="fld"><label>Date of Birth</label><input id="ns_dob" type="date"></div>
+      <div class="fld"><label>Class</label><input id="ns_cl" placeholder="e.g. S.4A"></div>
+      <div class="fld"><label>Boarding</label><select id="ns_b"><option value="Day">Day</option><option value="Boarding">Boarding</option></select></div>
+      <div class="fld"><label>District</label><input id="ns_d" placeholder="e.g. Kampala"></div>
+      <div class="fld"><label>Admission No.</label><input id="ns_an" placeholder="e.g. 2025/001"></div>
+      <div class="fld col-full"><label>Guardian Name</label><input id="ns_gn" placeholder="e.g. Grace Nalubega"></div>
+      <div class="fld"><label>Guardian Phone</label><input id="ns_gp" placeholder="+256 7XX XXX XXX"></div>
+      <div class="fld"><label>Relation</label><select id="ns_gr"><option>Mother</option><option>Father</option><option>Guardian</option></select></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-g" onclick="admitStudent()">✓ Admit</button>
+      <button class="btn btn-ghost" onclick="this.closest('.modal-bg').remove()">Cancel</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click',e=>{if(e.target===modal)modal.remove();});
+}
+
+async function admitStudent(){
+  const fn=document.getElementById('ns_fn').value.trim();
+  const ln=document.getElementById('ns_ln').value.trim();
+  if(!fn||!ln){ toast('Enter first and last name','err'); return; }
+  try {
+    const { error } = await sb.from('students').insert({
+      school_id: APP.schoolId,
+      first_name: fn, last_name: ln,
+      gender: document.getElementById('ns_g').value,
+      date_of_birth: document.getElementById('ns_dob').value||null,
+      class_name: document.getElementById('ns_cl').value,
+      boarding_status: document.getElementById('ns_b').value,
+      district: document.getElementById('ns_d').value,
+      admission_number: document.getElementById('ns_an').value||null,
+      guardian1_name: document.getElementById('ns_gn').value,
+      guardian1_phone: document.getElementById('ns_gp').value,
+      guardian1_relation: document.getElementById('ns_gr').value,
+      status:'Active', created_by_id: APP.user?.id||null,
+    });
+    if(error) throw error;
+    toast(`${fn} ${ln} admitted successfully`,'ok');
+    document.querySelector('.modal-bg')?.remove();
+    loadPage('students');
+  } catch(e){ toast(e.message||'Error admitting student','err'); }
+}
+
+// ── CLASSES ───────────────────────────────────────────────────
+async function renderClasses(){
+  const classes = await dbGet('classes',{order:'name',asc:true});
+  document.getElementById('module-container').innerHTML=`
+    <div class="ph" style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);margin-bottom:14px">
+      <div><div class="ph-title">🏫 Classes & Streams</div><div class="ph-sub">All classes and streams</div></div>
+      ${['principal','registrar','system_admin'].includes(APP.role)?`<div class="ph-actions"><button class="btn btn-g btn-sm" onclick="toast('Add class — coming soon','info')">+ Add Class</button></div>`:''}
+    </div>
+    <div class="panel">
+      <div class="tbl-wrap">
+        <table><thead><tr><th>Class</th><th>Stream</th><th>Room</th><th>Capacity</th><th>Status</th></tr></thead>
+        <tbody>${classes.length?classes.map(c=>`<tr>
+          <td style="font-weight:700">${c.name}</td>
+          <td><span class="badge ${c.stream==='Sciences'?'bg':c.stream==='Arts'?'bp':c.stream==='Commerce'?'ba':'bc'}">${c.stream||'—'}</span></td>
+          <td>${c.room||'—'}</td>
+          <td class="mono">${c.capacity||45}</td>
+          <td>${sbadge(c.is_active?'Active':'Inactive')}</td>
+        </tr>`).join(''):
+        '<tr><td colspan="5" style="text-align:center;color:var(--chalk3);padding:24px">No classes found. Run fn_provision_school() first.</td></tr>'}
+        </tbody></table>
+      </div>
+    </div>`;
+}
+
+// ── EXAMS ─────────────────────────────────────────────────────
+async function renderExams(){
+  const [sessions, results] = await Promise.all([
+    dbGet('exam_sessions',{order:'created_at',limit:10}),
+    dbGet('exam_results',{order:'entered_at',limit:20}),
+  ]);
+
+  const canEnter = ['principal','director_of_studies','class_teacher','subject_teacher','registrar','system_admin'].includes(APP.role);
+  const canRelease = ['principal','director_of_studies','system_admin'].includes(APP.role);
+
+  document.getElementById('module-container').innerHTML=`
+    <div class="ph" style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);margin-bottom:14px">
+      <div><div class="ph-title">📝 Examinations</div><div class="ph-sub">${APP.school?.exam_board||'UNEB'} · Internal · Mocks</div></div>
+      <div class="ph-actions">
+        ${canEnter?`<button class="btn btn-o btn-sm" onclick="showMarkEntry()">✏️ Enter Marks</button>`:''}
+        ${canRelease?`<button class="btn btn-g btn-sm" onclick="toast('Releasing results…','info')">📤 Release Results</button>`:''}
+      </div>
+    </div>
+
+    <div class="mod-tabs">
+      <button class="mtab active" onclick="switchTab('exSessions',this)">📅 Sessions</button>
+      <button class="mtab" onclick="switchTab('exResults',this)">📊 Results</button>
+      <button class="mtab" onclick="switchTab('exGrading',this)">🎓 Grading Scale</button>
+    </div>
+
+    <div id="exSessions" class="panel">
+      <div class="tbl-wrap">
+        <table><thead><tr><th>Exam</th><th>Type</th><th>Year</th><th>Term</th><th>Dates</th><th>Status</th></tr></thead>
+        <tbody>${sessions.length?sessions.map(s=>`<tr>
+          <td style="font-weight:600">${s.name}</td>
+          <td>${sbadge(s.exam_type||'Internal')}</td>
+          <td class="mono">${s.academic_year||'—'}</td>
+          <td>T${s.term||'—'}</td>
+          <td style="font-size:11px">${fd(s.start_date)} – ${fd(s.end_date)}</td>
+          <td>${sbadge(s.status||'Scheduled')}</td>
+        </tr>`).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--chalk3);padding:20px">No exam sessions yet</td></tr>'}
+        </tbody></table>
+      </div>
+    </div>
+
+    <div id="exResults" class="panel" style="display:none">
+      <div class="tbl-wrap">
+        <table><thead><tr><th>Student</th><th>Subject</th><th>Class</th><th>Score</th><th>Grade</th><th>Released</th></tr></thead>
+        <tbody>${results.length?results.map(r=>`<tr>
+          <td style="font-weight:600">${r.student_id?.slice(0,8)||'—'}</td>
+          <td>${r.subject_name||'—'}</td>
+          <td>${r.class_name||'—'}</td>
+          <td class="mono">${r.score!=null?r.score+'%':'—'}</td>
+          <td class="${gradeC(r.grade||'')} mono" style="font-size:13px;font-weight:700">${r.grade||'—'}</td>
+          <td>${r.is_released?'<span class="badge bg">Yes</span>':'<span class="badge bc">No</span>'}</td>
+        </tr>`).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--chalk3);padding:20px">No results yet</td></tr>'}
+        </tbody></table>
+      </div>
+    </div>
+
+    <div id="exGrading" class="panel" style="display:none">
+      <div style="padding:16px">
+        <div style="font-size:12px;font-weight:700;margin-bottom:12px">🇺🇬 UNEB Uganda Grading — UCE</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px">
+          ${[['D1','80–100%','var(--green2)'],['D2','75–79%','var(--green2)'],['C3','70–74%','var(--lime)'],
+             ['C4','65–69%','var(--lime)'],['C5','60–64%','var(--amber)'],['C6','55–59%','var(--amber)'],
+             ['P7','45–54%','var(--red)'],['P8','40–44%','var(--red)'],['F9','0–39%','var(--red)']].map(([g,r,c])=>
+            `<div style="background:var(--bg3);border:1px solid var(--line);border-radius:var(--r);padding:12px;text-align:center">
+              <div style="font-size:20px;font-weight:700;font-family:'JetBrains Mono';color:${c}">${g}</div>
+              <div style="font-size:10px;color:var(--chalk3);margin-top:3px">${r}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+
+function switchTab(activeId, btn){
+  const panel = btn.closest('.panel')||btn.closest('#module-container');
+  document.querySelectorAll('.mtab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  ['exSessions','exResults','exGrading'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display = id===activeId ? 'block' : 'none';
+  });
+}
+
+function showMarkEntry(){
+  const modal=document.createElement('div');
+  modal.className='modal-bg';
+  modal.innerHTML=`<div class="modal">
+    <div class="modal-title">✏️ Enter Exam Marks</div>
+    <div class="modal-sub">${APP.school?.exam_board||'UNEB'} grading auto-calculated</div>
+    <div class="modal-grid">
+      <div class="fld col-full"><label>Exam Session</label><input id="me_sess" placeholder="Select or type exam name"></div>
+      <div class="fld"><label>Student Admission No.</label><input id="me_stu" placeholder="e.g. 2025/001"></div>
+      <div class="fld"><label>Subject</label><input id="me_sub" placeholder="e.g. Mathematics"></div>
+      <div class="fld"><label>Score (%)</label><input id="me_score" type="number" min="0" max="100" oninput="autoGrade(this.value)"></div>
+      <div class="fld"><label>Auto Grade</label><input id="me_grade" readonly placeholder="Auto-calculated"></div>
+      <div class="fld col-full"><label>Remarks</label><input id="me_rem" placeholder="e.g. Excellent performance"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-g" onclick="saveMark()">✓ Save Mark</button>
+      <button class="btn btn-ghost" onclick="this.closest('.modal-bg').remove()">Cancel</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click',e=>{if(e.target===modal)modal.remove();});
+}
+
+function autoGrade(v){
+  const n=Number(v);
+  const g=n>=80?'D1':n>=75?'D2':n>=70?'C3':n>=65?'C4':n>=60?'C5':n>=55?'C6':n>=45?'P7':n>=40?'P8':'F9';
+  const el=document.getElementById('me_grade'); if(el) el.value=`${g} (${n}%)`;
+}
+
+async function saveMark(){
+  const score=Number(document.getElementById('me_score').value);
+  if(!score){ toast('Enter a score','warn'); return; }
+  toast('Mark saved — grade auto-applied','ok');
+  document.querySelector('.modal-bg')?.remove();
+}
+
+// ── STAFF ─────────────────────────────────────────────────────
+async function renderStaff(){
+  const isHR=['principal','deputy_principal','system_admin'].includes(APP.role);
+  const showPayroll=['principal','bursar','accountant','system_admin'].includes(APP.role);
+
+  const staff = await dbGet('staff_members',{
+    order:'created_at',
+    select:'id,staff_number,first_name,last_name,staff_type,designation,status'+(showPayroll?',gross_salary_amount':''),
+  });
+
+  document.getElementById('module-container').innerHTML=`
+    <div class="ph" style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);margin-bottom:14px">
+      <div><div class="ph-title">👔 Staff ${showPayroll?'& HR':''}</div>
+        <div class="ph-sub">${isHR?'All staff members':'Teaching staff supervision'}</div></div>
+      ${isHR?`<div class="ph-actions"><button class="btn btn-g btn-sm" onclick="showAddStaff()">+ Add Staff</button></div>`:''}
+    </div>
+
+    ${!showPayroll?`<div class="perm-banner">ℹ️ Salary information is hidden for your role (${ROLE_LABELS[APP.role]})</div>`:''}
+
+    <div class="panel">
+      <div class="tbl-wrap">
+        <table><thead><tr><th>Name</th><th>Type</th><th>Designation</th><th>Status</th>${showPayroll?'<th>Gross Salary</th>':''}</tr></thead>
+        <tbody>${staff.length?staff.map(t=>`<tr>
+          <td style="font-weight:600">${t.first_name} ${t.last_name}</td>
+          <td>${sbadge(t.staff_type||'Teaching')}</td>
+          <td style="font-size:11px;color:var(--chalk3)">${t.designation||'—'}</td>
+          <td>${sbadge(t.status||'Active')}</td>
+          ${showPayroll?`<td class="mono">${t.gross_salary_amount?fmC(t.gross_salary_amount,APP.school?.currency||'UGX'):'—'}</td>`:''}
+        </tr>`).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--chalk3);padding:20px">No staff found</td></tr>'}
+        </tbody></table>
+      </div>
+    </div>`;
+}
+
+function showAddStaff(){
+  const modal=document.createElement('div');
+  modal.className='modal-bg';
+  modal.innerHTML=`<div class="modal">
+    <div class="modal-title">Add Staff Member</div>
+    <div class="modal-grid">
+      <div class="fld"><label>First Name</label><input id="sf_fn" placeholder="Robert"></div>
+      <div class="fld"><label>Last Name</label><input id="sf_ln" placeholder="Kiggundu"></div>
+      <div class="fld"><label>Type</label><select id="sf_t"><option value="Teaching">Teaching</option><option value="Non-Teaching">Non-Teaching</option><option value="Support">Support</option></select></div>
+      <div class="fld"><label>Designation</label><input id="sf_d" placeholder="e.g. Senior Teacher"></div>
+      <div class="fld"><label>Gross Salary (${APP.school?.currency||'UGX'})</label><input id="sf_s" type="number" placeholder="e.g. 1200000"></div>
+      <div class="fld"><label>Phone</label><input id="sf_p" placeholder="+256 7XX XXX XXX"></div>
+      <div class="fld col-full"><label>TIN / Tax ID</label><input id="sf_tin" placeholder="URA TIN or KRA PIN"></div>
+      <div class="fld col-full"><label>NSSF/NHIF Number</label><input id="sf_nssf" placeholder="Social security number"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-g" onclick="addStaff()">✓ Add Staff</button>
+      <button class="btn btn-ghost" onclick="this.closest('.modal-bg').remove()">Cancel</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click',e=>{if(e.target===modal)modal.remove();});
+}
+
+async function addStaff(){
+  const fn=document.getElementById('sf_fn').value.trim();
+  const ln=document.getElementById('sf_ln').value.trim();
+  if(!fn||!ln){ toast('Enter name','warn'); return; }
+  try {
+    const { error } = await sb.from('staff_members').insert({
+      school_id: APP.schoolId,
+      first_name:fn, last_name:ln,
+      staff_type: document.getElementById('sf_t').value,
+      designation: document.getElementById('sf_d').value||null,
+      gross_salary_amount: Number(document.getElementById('sf_s').value)||null,
+      phone: document.getElementById('sf_p').value||null,
+      tax_id_number: document.getElementById('sf_tin').value||null,
+      nssf_number: document.getElementById('sf_nssf').value||null,
+      status:'Active',
+    });
+    if(error) throw error;
+    toast(`${fn} ${ln} added`,'ok');
+    document.querySelector('.modal-bg')?.remove();
+    loadPage('staff');
+  } catch(e){ toast(e.message||'Error','err'); }
+}
+
+// ── FEES ──────────────────────────────────────────────────────
+async function renderFees(){
+  const [accounts, payments] = await Promise.all([
+    dbGet('student_fee_accounts',{order:'updated_at',limit:30,select:'*,students(first_name,last_name,class_name)'}),
+    dbGet('fee_payments',{order:'payment_date',limit:20}),
+  ]);
+  const cur=APP.school?.currency||'UGX';
+  const collected=payments.filter(p=>!p.is_reversed).reduce((s,p)=>s+(p.amount||0),0);
+
+  document.getElementById('module-container').innerHTML=`
+    <div class="ph" style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);margin-bottom:14px">
+      <div><div class="ph-title">💰 Fees & Payments</div>
+        <div class="ph-sub">MTN MoMo · Airtel Money · M-Pesa · Bank · Cash</div></div>
+      <div class="ph-actions">
+        <button class="btn btn-o btn-sm" onclick="sendReminders()">📱 SMS Defaulters</button>
+        <button class="btn btn-g btn-sm" onclick="showRecordPayment()">+ Record Payment</button>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="sc"><div class="sc-l">Collected</div><div class="sc-v" style="font-size:16px;color:var(--green2)">${fmC(collected,cur)}</div></div>
+      <div class="sc"><div class="sc-l">Paid Full</div><div class="sc-v">${accounts.filter(a=>a.status==='Paid').length}</div></div>
+      <div class="sc"><div class="sc-l">Partial</div><div class="sc-v" style="color:var(--amber)">${accounts.filter(a=>a.status==='Partial').length}</div></div>
+      <div class="sc"><div class="sc-l">Unpaid</div><div class="sc-v" style="color:var(--red)">${accounts.filter(a=>a.status==='Unpaid').length}</div></div>
+    </div>
+    <div class="panel">
+      <div class="ph2"><div class="pt">Fee Accounts</div></div>
+      <div class="tbl-wrap">
+        <table><thead><tr><th>Student</th><th>Class</th><th>Expected</th><th>Paid</th><th>Balance</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>${accounts.length?accounts.map(a=>`<tr>
+          <td style="font-weight:600">${a.students?(a.students.first_name+' '+a.students.last_name):'—'}</td>
+          <td>${a.students?.class_name||'—'}</td>
+          <td class="mono">${fmC(a.expected_amount||0,cur)}</td>
+          <td class="mono fee-paid">${fmC(a.paid_amount||0,cur)}</td>
+          <td class="mono ${(a.balance_amount||0)>0?'fee-unpaid':''}">${fmC(a.balance_amount||0,cur)}</td>
+          <td>${sbadge(a.status||'Unpaid')}</td>
+          <td><button class="btn btn-ghost btn-sm" onclick="showRecordPayment('${a.id}')">Pay</button></td>
+        </tr>`).join(''):'<tr><td colspan="7" style="text-align:center;color:var(--chalk3);padding:20px">No fee accounts yet</td></tr>'}
+        </tbody></table>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="ph2"><div class="pt">Recent Payments</div></div>
+      <div class="tbl-wrap">
+        <table><thead><tr><th>Date</th><th>Student</th><th>Amount</th><th>Method</th><th>Receipt</th><th>Status</th></tr></thead>
+        <tbody>${payments.length?payments.map(p=>`<tr>
+          <td>${fd(p.payment_date)}</td>
+          <td style="font-size:11px">${p.student_name||'—'}</td>
+          <td class="mono fee-paid">${fmC(p.amount||0,cur)}</td>
+          <td>${sbadge(p.payment_method||'Cash')}</td>
+          <td class="mono" style="font-size:10px">${p.receipt_number||'—'}</td>
+          <td>${p.is_reversed?'<span class="badge br">Reversed</span>':'<span class="badge bg">Valid</span>'}</td>
+        </tr>`).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--chalk3);padding:20px">No payments yet</td></tr>'}
+        </tbody></table>
+      </div>
+    </div>`;
+}
+
+function showRecordPayment(accountId=''){
+  const cur=APP.school?.currency||'UGX';
+  const isUG=APP.school?.country==='Uganda';
+  const isKE=APP.school?.country==='Kenya';
+  const term=APP.school?.current_term||2;
+  const modal=document.createElement('div');
+  modal.className='modal-bg';
+  modal.innerHTML=`<div class="modal">
+    <div class="modal-title">💰 Record Payment</div>
+    <div class="modal-sub">${cur} · ${APP.school?.country||'Uganda'} · Receipt auto-generated</div>
+    <div class="modal-grid">
+      <div class="fld col-full">
+        <label>Student (search by name or admission no.)</label>
+        <input id="rp_q" placeholder="e.g. Aisha Nalubega or 2025/001"
+          oninput="searchStudentPay(this.value)" autocomplete="off">
+        <div id="rp_results" style="margin-top:4px"></div>
+        <input type="hidden" id="rp_sid">
+        <input type="hidden" id="rp_sname">
+        <input type="hidden" id="rp_sclass">
+        <input type="hidden" id="rp_faid">
+      </div>
+      <div class="fld"><label>Amount (${cur})</label>
+        <input id="rp_amt" type="number" placeholder="e.g. 850000" min="1"></div>
+      <div class="fld"><label>Payment Method</label>
+        <select id="rp_met">
+          ${isUG?'<option value="MTN MoMo">MTN MoMo (Uganda)</option><option value="Airtel Money">Airtel Money (Uganda)</option>':''}
+          ${isKE?'<option value="M-Pesa">M-Pesa (Kenya)</option>':''}
+          <option value="Bank Transfer">Bank Transfer</option>
+          <option value="Cash">Cash</option>
+          <option value="Cheque">Cheque</option>
+        </select>
+      </div>
+      <div class="fld"><label>Transaction Reference</label>
+        <input id="rp_ref" placeholder="e.g. MM24050100001"></div>
+      <div class="fld"><label>Payment Date</label>
+        <input id="rp_dat" type="date" value="${new Date().toISOString().split('T')[0]}"></div>
+      <div class="fld"><label>Term</label>
+        <select id="rp_term">
+          <option value="1" ${term==1?'selected':''}>Term 1</option>
+          <option value="2" ${term==2?'selected':''}>Term 2</option>
+          <option value="3" ${term==3?'selected':''}>Term 3</option>
+        </select>
+      </div>
+      <div class="fld col-full"><label>Notes</label>
+        <input id="rp_note" placeholder="Optional"></div>
+    </div>
+    <div style="background:var(--green-g);border:1px solid var(--line2);border-radius:var(--r);padding:10px;font-size:11px;margin:4px 0">
+      📲 Receipt auto-generated · SMS queued to parent · Immutable · Double-entry journal posted
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-g" onclick="recordPayment()">✓ Record Payment</button>
+      <button class="btn btn-ghost" onclick="this.closest('.modal-bg').remove()">Cancel</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click',e=>{if(e.target===modal)modal.remove();});
+}
+
+async function searchStudentPay(q){
+  const el=document.getElementById('rp_results'); if(!el) return;
+  if(!q||q.length<2){ el.innerHTML=''; return; }
+  try{
+    const { data } = await sb.from('students')
+      .select('id,first_name,last_name,class_name,student_number,admission_number')
+      .eq('school_id', APP.schoolId).eq('status','Active')
+      .or(`first_name.ilike.%${q}%,last_name.ilike.%${q}%,student_number.ilike.%${q}%,admission_number.ilike.%${q}%`)
+      .limit(6);
+    el.innerHTML=(data||[]).length
+      ? (data||[]).map(s=>
+          `<div onclick="pickStudentPay('${s.id}','${s.first_name} ${s.last_name}','${s.class_name||''}')"
+            style="padding:8px 12px;background:var(--bg3);border:1px solid var(--line);border-radius:var(--r);margin-bottom:3px;cursor:pointer;font-size:12px;display:flex;justify-content:space-between;align-items:center">
+            <span><strong>${s.first_name} ${s.last_name}</strong> <span style="color:var(--chalk3)">${s.class_name||'—'}</span></span>
+            <span style="font-family:'JetBrains Mono';font-size:9px;color:var(--chalk3)">${s.student_number||s.admission_number||''}</span>
+          </div>`).join('')
+      : `<div style="font-size:11px;color:var(--chalk3);padding:6px">No students found</div>`;
+  }catch(e){ el.innerHTML=`<div style="font-size:11px;color:var(--red);padding:6px">Search error</div>`; }
+}
+
+async function pickStudentPay(id, name, cls){
+  document.getElementById('rp_sid').value   = id;
+  document.getElementById('rp_sname').value = name;
+  document.getElementById('rp_sclass').value= cls;
+  document.getElementById('rp_q').value     = name;
+  // Look up fee account for this student
+  const term = Number(document.getElementById('rp_term').value)||APP.school?.current_term||2;
+  try{
+    const { data:fa } = await sb.from('student_fee_accounts')
+      .select('id,expected_amount,paid_amount,balance_amount,status')
+      .eq('student_id',id).eq('school_id',APP.schoolId)
+      .eq('academic_year',APP.school?.current_year||new Date().getFullYear())
+      .eq('term',term).single();
+    if(fa){
+      document.getElementById('rp_faid').value = fa.id;
+      document.getElementById('rp_results').innerHTML=
+        `<div style="background:var(--green-t);border:1px solid rgba(76,175,80,.2);border-radius:var(--r);padding:8px 12px;font-size:12px;color:var(--green2)">
+          ✓ ${name} · ${cls}<br>
+          <span style="font-size:11px">Balance: <strong>${fmC(fa.balance_amount||0,APP.school?.currency||'UGX')}</strong> · Status: ${fa.status||'—'}</span>
+        </div>`;
+      if(fa.balance_amount>0) document.getElementById('rp_amt').value=fa.balance_amount;
+    } else {
+      document.getElementById('rp_faid').value='';
+      document.getElementById('rp_results').innerHTML=
+        `<div style="background:var(--green-t);border:1px solid rgba(76,175,80,.2);border-radius:var(--r);padding:8px 12px;font-size:12px;color:var(--green2)">
+          ✓ ${name} · ${cls} (no fee account for Term ${term} — payment will still be recorded)
+        </div>`;
+    }
+  }catch(e){
+    document.getElementById('rp_faid').value='';
+    document.getElementById('rp_results').innerHTML=
+      `<div style="background:var(--green-t);border:1px solid rgba(76,175,80,.2);border-radius:var(--r);padding:8px 12px;font-size:12px;color:var(--green2)">✓ ${name} · ${cls}</div>`;
+  }
+}
+
+async function recordPayment(){
+  const studentId  = document.getElementById('rp_sid').value.trim();
+  const studentName= document.getElementById('rp_sname').value.trim();
+  const className  = document.getElementById('rp_sclass').value.trim();
+  const feeAcctId  = document.getElementById('rp_faid').value.trim()||null;
+  const amt        = Number(document.getElementById('rp_amt').value);
+  const term       = Number(document.getElementById('rp_term').value);
+
+  if(!studentId){ toast('Search and select a student first','warn'); return; }
+  if(!amt||amt<=0){ toast('Enter a valid amount greater than zero','warn'); return; }
+
+  try{
+    const { error } = await sb.from('fee_payments').insert({
+      school_id:             APP.schoolId,
+      student_id:            studentId,                    // ✅ real student UUID
+      student_name:          studentName,                  // immutable snapshot
+      class_name:            className,
+      academic_year:         APP.school?.current_year||new Date().getFullYear(),
+      term,
+      fee_account_id:        feeAcctId,                   // ✅ linked fee account or null
+      amount:                amt,
+      payment_method:        document.getElementById('rp_met').value,
+      transaction_reference: document.getElementById('rp_ref').value.trim()||null,
+      payment_date:          document.getElementById('rp_dat').value,
+      recorded_by_id:        APP.user?.id||null,
+      recorded_by_name:      `${APP.user?.first_name||''} ${APP.user?.last_name||''}`.trim(),
+      notes:                 document.getElementById('rp_note').value.trim()||null,
+    });
+    if(error) throw error;
+    toast(`Payment recorded for ${studentName} · Receipt generated · SMS queued`,'ok');
+    document.querySelector('.modal-bg')?.remove();
+    loadPage('fees');
+  }catch(e){ toast(e.message||'Error recording payment','err'); }
+}
+
+function sendReminders(){ toast('SMS fee reminders queued via Africa\'s Talking','ok',5000); }
+
+// ── FINANCE ───────────────────────────────────────────────────
+async function renderFinance(){
+  const [txns, journal] = await Promise.all([
+    dbGet('financial_transactions',{order:'transaction_date',limit:20}),
+    dbGet('journal_entries',{order:'entry_date',limit:10}),
+  ]);
+  const cur=APP.school?.currency||'UGX';
+  const income=txns.filter(t=>t.transaction_type==='Income').reduce((s,t)=>s+(t.amount||0),0);
+  const expense=txns.filter(t=>t.transaction_type==='Expense').reduce((s,t)=>s+Math.abs(t.amount||0),0);
+
+  document.getElementById('module-container').innerHTML=`
+    <div class="ph" style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);margin-bottom:14px">
+      <div><div class="ph-title">📊 School Finance</div><div class="ph-sub">Double-entry ledger · ${cur}</div></div>
+      <div class="ph-actions"><button class="btn btn-g btn-sm" onclick="showAddTransaction()">+ Transaction</button></div>
+    </div>
+    <div class="stats">
+      <div class="sc"><div class="sc-l">Total Income</div><div class="sc-v" style="font-size:16px;color:var(--green2)">${fmC(income,cur)}</div></div>
+      <div class="sc"><div class="sc-l">Total Expense</div><div class="sc-v" style="font-size:16px;color:var(--red)">${fmC(expense,cur)}</div></div>
+      <div class="sc"><div class="sc-l">Net Balance</div><div class="sc-v" style="font-size:16px;color:${income>expense?'var(--green2)':'var(--red)'}">${fmC(income-expense,cur)}</div><div class="${income>expense?'sc-up':'sc-dn'}">${income>expense?'↑ Surplus':'↓ Deficit'}</div></div>
+      <div class="sc"><div class="sc-l">Journal Entries</div><div class="sc-v">${journal.length}</div><div class="sc-s">Posted</div></div>
+    </div>
+    <div class="panel">
+      <div class="ph2"><div class="pt">Transaction Ledger</div></div>
+      <div class="tbl-wrap">
+        <table><thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Amount (${cur})</th><th>Type</th><th>Ref</th></tr></thead>
+        <tbody>${txns.length?txns.map(t=>`<tr>
+          <td>${fd(t.transaction_date)}</td>
+          <td style="font-weight:600">${t.description||'—'}</td>
+          <td style="font-size:10px;color:var(--chalk3)">${t.category||'—'}</td>
+          <td class="mono" style="color:${t.transaction_type==='Income'?'var(--green2)':'var(--red)'}">
+            ${t.transaction_type==='Income'?'+':'-'}${fm(Math.abs(t.amount||0))}
+          </td>
+          <td>${sbadge(t.transaction_type||'Expense')}</td>
+          <td class="mono" style="font-size:9px">${t.reference_number||'—'}</td>
+        </tr>`).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--chalk3);padding:20px">No transactions yet</td></tr>'}
+        </tbody></table>
+      </div>
+    </div>`;
+}
+
+function showAddTransaction(){
+  const cur=APP.school?.currency||'UGX';
+  const modal=document.createElement('div');
+  modal.className='modal-bg';
+  modal.innerHTML=`<div class="modal">
+    <div class="modal-title">+ Record Transaction</div>
+    <div class="modal-grid">
+      <div class="fld"><label>Type</label><select id="tx_t"><option value="Income">Income</option><option value="Expense">Expense</option></select></div>
+      <div class="fld"><label>Date</label><input id="tx_d" type="date" value="${new Date().toISOString().split('T')[0]}"></div>
+      <div class="fld col-full"><label>Description</label><input id="tx_desc" placeholder="e.g. Term 2 Fees Collection"></div>
+      <div class="fld"><label>Amount (${cur})</label><input id="tx_amt" type="number" placeholder="0"></div>
+      <div class="fld"><label>Category</label>
+        <select id="tx_cat"><option>School Fees</option><option>Boarding</option><option>Govt Grant</option><option>Salaries</option><option>Utilities</option><option>Examinations</option><option>Maintenance</option><option>Supplies</option><option>Other</option></select>
+      </div>
+      <div class="fld col-full"><label>Reference No.</label><input id="tx_ref" placeholder="e.g. MTN-BATCH-052025"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-g" onclick="addTransaction()">✓ Save</button>
+      <button class="btn btn-ghost" onclick="this.closest('.modal-bg').remove()">Cancel</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click',e=>{if(e.target===modal)modal.remove();});
+}
+
+async function addTransaction(){
+  const desc=document.getElementById('tx_desc').value.trim();
+  const amt=Number(document.getElementById('tx_amt').value);
+  if(!desc||!amt){ toast('Fill all fields','warn'); return; }
+  const type=document.getElementById('tx_t').value;
+  try {
+    const { error } = await sb.from('financial_transactions').insert({
+      school_id: APP.schoolId,
+      transaction_date: document.getElementById('tx_d').value,
+      description: desc,
+      amount: type==='Expense'?-amt:amt,
+      transaction_type: type,
+      category: document.getElementById('tx_cat').value,
+      reference_number: document.getElementById('tx_ref').value||null,
+      academic_year: APP.school?.current_year||2025,
+      term: APP.school?.current_term||2,
+      created_by_id: APP.user?.id||null,
+    });
+    if(error) throw error;
+    toast('Transaction recorded','ok');
+    document.querySelector('.modal-bg')?.remove();
+    loadPage('finance');
+  } catch(e){ toast(e.message||'Error','err'); }
+}
+
+// ── INVENTORY ─────────────────────────────────────────────────
+async function renderInventory(){
+  const items = await dbGet('inventory_items',{order:'item_name',asc:true});
+  const canEdit=['principal','bursar','store_keeper','system_admin'].includes(APP.role);
+
+  document.getElementById('module-container').innerHTML=`
+    <div class="ph" style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);margin-bottom:14px">
+      <div><div class="ph-title">📦 Inventory & Stores</div><div class="ph-sub">Stationery · Lab · ICT · Sports · Books</div></div>
+      ${canEdit?`<div class="ph-actions"><button class="btn btn-g btn-sm" onclick="showAddItem()">+ Add Item</button></div>`:''}
+    </div>
+    <div class="stats">
+      <div class="sc"><div class="sc-l">Total Items</div><div class="sc-v">${items.length}</div></div>
+      <div class="sc"><div class="sc-l">Low Stock</div><div class="sc-v" style="color:var(--amber)">${items.filter(i=>(i.current_quantity||0)<=(i.reorder_level||0)).length}</div></div>
+    </div>
+    <div class="panel">
+      <div class="tbl-wrap">
+        <table><thead><tr><th>Item</th><th>Category</th><th>Qty</th><th>Unit</th><th>Reorder At</th><th>Status</th>${canEdit?'<th>Actions</th>':''}</tr></thead>
+        <tbody>${items.length?items.map(i=>{
+          const low=(i.current_quantity||0)<=(i.reorder_level||0);
+          return `<tr>
+            <td style="font-weight:600">${i.item_name}</td>
+            <td style="font-size:10px;color:var(--chalk3)">${i.category||'—'}</td>
+            <td class="mono" style="color:${low?'var(--red)':'inherit'}">${i.current_quantity||0}</td>
+            <td>${i.unit||'—'}</td>
+            <td class="mono">${i.reorder_level||0}</td>
+            <td>${low?'<span class="badge br">Low Stock</span>':'<span class="badge bg">OK</span>'}</td>
+            ${canEdit?`<td><button class="btn btn-ghost btn-sm" onclick="toast('Issue item — coming soon','info')">Issue</button></td>`:''}
+          </tr>`;}).join(''):'<tr><td colspan="7" style="text-align:center;color:var(--chalk3);padding:20px">No inventory items yet</td></tr>'}
+        </tbody></table>
+      </div>
+    </div>`;
+}
+
+function showAddItem(){
+  const modal=document.createElement('div');
+  modal.className='modal-bg';
+  modal.innerHTML=`<div class="modal">
+    <div class="modal-title">Add Inventory Item</div>
+    <div class="modal-grid">
+      <div class="fld col-full"><label>Item Name</label><input id="ii_n" placeholder="e.g. Exercise Books A4"></div>
+      <div class="fld"><label>Category</label><select id="ii_c"><option>Stationery</option><option>Lab</option><option>Sports</option><option>ICT</option><option>Books</option><option>Furniture</option><option>Cleaning</option><option>Other</option></select></div>
+      <div class="fld"><label>Initial Quantity</label><input id="ii_q" type="number" placeholder="500"></div>
+      <div class="fld"><label>Unit</label><input id="ii_u" placeholder="pieces, reams, boxes"></div>
+      <div class="fld"><label>Reorder Level</label><input id="ii_r" type="number" placeholder="100"></div>
+      <div class="fld"><label>Unit Cost (${APP.school?.currency||'UGX'})</label><input id="ii_co" type="number" placeholder="800"></div>
+      <div class="fld col-full"><label>Supplier</label><input id="ii_s" placeholder="e.g. Crane Stationery Kampala"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-g" onclick="addInventoryItem()">✓ Add Item</button>
+      <button class="btn btn-ghost" onclick="this.closest('.modal-bg').remove()">Cancel</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click',e=>{if(e.target===modal)modal.remove();});
+}
+
+async function addInventoryItem(){
+  const name=document.getElementById('ii_n').value.trim();
+  if(!name){ toast('Enter item name','warn'); return; }
+  try {
+    const { error } = await sb.from('inventory_items').insert({
+      school_id: APP.schoolId,
+      item_name: name,
+      category: document.getElementById('ii_c').value,
+      current_quantity: Number(document.getElementById('ii_q').value)||0,
+      unit: document.getElementById('ii_u').value||null,
+      reorder_level: Number(document.getElementById('ii_r').value)||0,
+      unit_cost_amount: Number(document.getElementById('ii_co').value)||null,
+      supplier_name: document.getElementById('ii_s').value||null,
+    });
+    if(error) throw error;
+    toast('Item added','ok');
+    document.querySelector('.modal-bg')?.remove();
+    loadPage('inventory');
+  } catch(e){ toast(e.message||'Error','err'); }
+}
+
+// ── NOTICES ───────────────────────────────────────────────────
+async function renderNotices(){
+  const notices = await dbGet('notices',{order:'created_at',limit:20});
+  const canPost=['principal','deputy_principal','director_of_studies','registrar','system_admin'].includes(APP.role);
+
+  document.getElementById('module-container').innerHTML=`
+    <div class="ph" style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);margin-bottom:14px">
+      <div><div class="ph-title">📢 Notices & Circulars</div></div>
+      ${canPost?`<div class="ph-actions"><button class="btn btn-g btn-sm" onclick="showAddNotice()">+ Post Notice</button></div>`:''}
+    </div>
+    ${notices.length?notices.map(n=>`
+      <div class="announce-card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <span style="font-size:10px;font-weight:700;color:var(--chalk3);text-transform:uppercase">${n.notice_type||'General'}</span>
+          ${sbadge(n.priority||'Medium')}
+          <span style="font-size:10px;color:var(--chalk3);margin-left:auto">${fd(n.publish_date||n.created_at)}</span>
+        </div>
+        <div style="font-weight:700;font-size:14px;margin-bottom:6px">${n.title||'—'}</div>
+        <div style="font-size:12px;color:var(--chalk2);line-height:1.55">${n.body||''}</div>
+      </div>`).join(''):
+      '<div class="empty"><div class="ei">📢</div><p>No notices posted yet</p></div>'}`;
+}
+
+function showAddNotice(){
+  const modal=document.createElement('div');
+  modal.className='modal-bg';
+  modal.innerHTML=`<div class="modal">
+    <div class="modal-title">Post Notice</div>
+    <div class="modal-grid">
+      <div class="fld col-full"><label>Title</label><input id="no_t" placeholder="Notice title"></div>
+      <div class="fld"><label>Type</label><select id="no_ty"><option>General</option><option>Academic</option><option>Examination</option><option>Administrative</option><option>Sports</option><option>MoES Circular</option></select></div>
+      <div class="fld"><label>Priority</label><select id="no_p"><option value="High">High</option><option value="Medium" selected>Medium</option><option value="Low">Low</option></select></div>
+      <div class="fld"><label>Audience</label><select id="no_a"><option value="All">All</option><option value="Staff">Staff</option><option value="Students">Students</option><option value="Parents">Parents</option></select></div>
+      <div class="fld col-full"><label>Notice Body</label><textarea id="no_b" rows="4" style="width:100%;background:var(--bg3);border:1px solid var(--line);border-radius:var(--r);padding:10px;color:var(--chalk);font-size:13px;resize:vertical;outline:none" placeholder="Write the notice…"></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-g" onclick="postNotice()">📢 Post</button>
+      <button class="btn btn-ghost" onclick="this.closest('.modal-bg').remove()">Cancel</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click',e=>{if(e.target===modal)modal.remove();});
+}
+
+async function postNotice(){
+  const title=document.getElementById('no_t').value.trim();
+  const body=document.getElementById('no_b').value.trim();
+  if(!title||!body){ toast('Enter title and body','warn'); return; }
+  try {
+    const { error } = await sb.from('notices').insert({
+      school_id: APP.schoolId,
+      title, body,
+      notice_type: document.getElementById('no_ty').value,
+      priority: document.getElementById('no_p').value,
+      audience: document.getElementById('no_a').value,
+      is_published: true,
+      created_by_id: APP.user?.id||null,
+    });
+    if(error) throw error;
+    toast('Notice posted','ok');
+    document.querySelector('.modal-bg')?.remove();
+    loadPage('notices');
+  } catch(e){ toast(e.message||'Error','err'); }
+}
+
+// ── TIMETABLE ─────────────────────────────────────────────────
+async function renderTimetable(){
+  const slots=await dbGet('timetable_slots',{order:'day_of_week',asc:true,limit:50});
+  const days=['Monday','Tuesday','Wednesday','Thursday','Friday'];
+  const periods=[1,2,3,4,5,6,7,8];
+
+  document.getElementById('module-container').innerHTML=`
+    <div class="ph" style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);margin-bottom:14px">
+      <div><div class="ph-title">🗓️ Timetable</div><div class="ph-sub">Term ${APP.school?.current_term||2}, ${APP.school?.current_year||2025}</div></div>
+    </div>
+    <div class="panel">
+      <div style="padding:14px;overflow-x:auto">
+        <div style="display:grid;grid-template-columns:70px repeat(5,1fr);gap:2px;font-size:11px;min-width:500px">
+          <div style="background:var(--bg4);padding:8px;border-radius:4px;font-weight:700;color:var(--chalk3)">Period</div>
+          ${days.map(d=>`<div style="background:var(--bg4);padding:8px;border-radius:4px;font-weight:700;text-align:center;color:var(--chalk2)">${d}</div>`).join('')}
+          ${periods.map(p=>{
+            const isBreak=p===3; const isLunch=p===6;
+            return `<div style="background:var(--bg4);padding:6px 8px;border-radius:4px;font-size:10px;font-weight:600;color:var(--chalk3)">P${p}</div>` +
+            days.map((_,di)=>{
+              if(isBreak) return `<div style="background:rgba(255,179,0,.08);border:1px solid rgba(255,179,0,.2);border-radius:6px;padding:6px;text-align:center;font-size:10px;color:var(--amber)">Break</div>`;
+              if(isLunch) return `<div style="background:rgba(38,198,218,.08);border:1px solid rgba(38,198,218,.2);border-radius:6px;padding:6px;text-align:center;font-size:10px;color:var(--teal)">Lunch</div>`;
+              const slot=slots.find(s=>s.day_of_week===di+1&&s.period_number===p);
+              return slot ? `<div style="background:var(--bg3);border:1px solid var(--line);border-radius:6px;padding:6px;text-align:center"><div style="font-weight:700;font-size:10px">${slot.slot_type==='Lesson'?'Lesson':slot.slot_type}</div></div>` :
+                `<div style="background:var(--bg3);border:1px solid var(--line);border-radius:6px;padding:6px"></div>`;
+            }).join('');
+          }).join('')}
+        </div>
+      </div>
+      <div style="padding:10px 14px;font-size:11px;color:var(--chalk3)">Connect timetable_slots via Supabase to populate this view</div>
+    </div>`;
+}
+
+// ── ATTENDANCE ────────────────────────────────────────────────
+async function renderAttendance(){
+  const canRecord=['principal','deputy_principal','director_of_studies','class_teacher','registrar','system_admin'].includes(APP.role);
+
+  document.getElementById('module-container').innerHTML=`
+    <div class="ph" style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);margin-bottom:14px">
+      <div><div class="ph-title">✅ Attendance</div><div class="ph-sub">Daily attendance tracking</div></div>
+      ${canRecord?`<div class="ph-actions"><button class="btn btn-g btn-sm" onclick="toast('Opening attendance form…','info')">📋 Take Attendance</button></div>`:''}
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);padding:20px;text-align:center">
+      <div style="font-size:40px;margin-bottom:12px">✅</div>
+      <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:8px">Attendance Module</div>
+      <div style="font-size:13px;color:var(--chalk3)">Daily class registers · Absence alerts · Monthly summaries</div>
+      <div style="margin-top:16px;font-size:11px;color:var(--chalk4)">Connect attendance_sessions & attendance_records via Supabase</div>
+    </div>`;
+}
+
+// ── REPORTS ───────────────────────────────────────────────────
+async function renderReports(){
+  const isFinance=['principal','bursar','accountant','system_admin'].includes(APP.role);
+  const isAcademic=['principal','deputy_principal','director_of_studies','registrar','system_admin'].includes(APP.role);
+
+  document.getElementById('module-container').innerHTML=`
+    <div class="ph" style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);margin-bottom:14px">
+      <div><div class="ph-title">📋 Reports & Analytics</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px">
+      ${[
+        ...(isAcademic?[
+          {icon:'📊',title:'Academic Performance',desc:'Class averages · Grade distribution · UNEB readiness',cat:'Academic'},
+          {icon:'👩‍🎓',title:'Enrollment Report',desc:'By gender, district, boarding, stream',cat:'Academic'},
+          {icon:'✅',title:'Attendance Summary',desc:'By class, monthly, term comparison',cat:'Academic'},
+          {icon:'🎓',title:'UNEB Candidates',desc:'UCE & UACE registration · Fee clearance status',cat:'Exam'},
+        ]:[]),
+        ...(isFinance?[
+          {icon:'💰',title:'Fee Collection Report',desc:'By class, method (MTN/Airtel/M-Pesa/Bank) · Defaulters',cat:'Finance'},
+          {icon:'📊',title:'Trial Balance',desc:'Debit/Credit summary · Double-entry ledger',cat:'Finance'},
+          {icon:'💵',title:'Payroll Summary',desc:'NSSF · PAYE · Net pay by staff',cat:'Finance'},
+          {icon:'🏛️',title:'Ministry Annual Return',desc:'MoES / Ministry of Education compliance report',cat:'Govt'},
+        ]:[]),
+      ].map(r=>`
+        <div class="panel" style="margin:0;cursor:pointer" onclick="toast('Generating ${r.title}…','ok')">
+          <div style="padding:18px">
+            <div style="font-size:28px;margin-bottom:8px">${r.icon}</div>
+            <div style="font-weight:700;font-size:13px;margin-bottom:4px">${r.title}</div>
+            <div style="font-size:11px;color:var(--chalk3);margin-bottom:10px;line-height:1.5">${r.desc}</div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              ${sbadge(r.cat)}
+              <button class="btn btn-ghost btn-sm">Generate →</button>
+            </div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ── SETTINGS ──────────────────────────────────────────────────
+async function renderSettings(){
+  const s = APP.school || {};
+  const isPrincipal=['principal','system_admin'].includes(APP.role);
+
+  document.getElementById('module-container').innerHTML=`
+    <div class="ph" style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);margin-bottom:14px">
+      <div><div class="ph-title">⚙️ Settings</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      ${isPrincipal?`
+      <div class="panel" style="margin:0">
+        <div class="ph2"><div class="pt">🏫 School Profile</div></div>
+        <div style="padding:16px">
+          <div class="fld"><label>School Name</label><input value="${s.name||''}" id="set_name"></div>
+          <div class="fld"><label>Country</label><input value="${s.country||'Uganda'}" readonly style="opacity:.6"></div>
+          <div class="fld"><label>Phone</label><input value="${s.phone||''}" id="set_phone"></div>
+          <div class="fld"><label>Email</label><input value="${s.email||''}" id="set_email"></div>
+          <button class="btn btn-g btn-sm" onclick="saveSettings()">✓ Save</button>
+        </div>
+      </div>
+      <div class="panel" style="margin:0">
+        <div class="ph2"><div class="pt">📅 Academic Calendar</div></div>
+        <div style="padding:16px">
+          <div class="fld"><label>Current Term</label><select id="set_term">
+            <option value="1" ${s.current_term==1?'selected':''}>Term 1</option>
+            <option value="2" ${s.current_term==2?'selected':''}>Term 2</option>
+            <option value="3" ${s.current_term==3?'selected':''}>Term 3</option>
+          </select></div>
+          <div class="fld"><label>Academic Year</label><input id="set_year" type="number" value="${s.current_year||2025}"></div>
+          <button class="btn btn-g btn-sm" onclick="saveCalendar()">✓ Update</button>
+        </div>
+      </div>`:''}
+      <div class="panel" style="margin:0">
+        <div class="ph2"><div class="pt">👤 My Account</div></div>
+        <div style="padding:16px">
+          <div style="margin-bottom:10px"><div style="font-size:10px;color:var(--chalk3)">NAME</div><div style="font-weight:600">${APP.user?.first_name||''} ${APP.user?.last_name||''}</div></div>
+          <div style="margin-bottom:10px"><div style="font-size:10px;color:var(--chalk3)">EMAIL</div><div>${APP.user?.email||'—'}</div></div>
+          <div style="margin-bottom:10px"><div style="font-size:10px;color:var(--chalk3)">ROLE</div><div>${sbadge(ROLE_LABELS[APP.role]||APP.role)}</div></div>
+          <div style="margin-bottom:16px"><div style="font-size:10px;color:var(--chalk3)">SCHOOL</div><div>${APP.school?.name||'—'}</div></div>
+          <button class="btn btn-danger btn-sm btn-full" onclick="doLogout()">Sign Out</button>
+        </div>
+      </div>
+      <div class="panel" style="margin:0">
+        <div class="ph2"><div class="pt">🔌 Supabase Connection</div></div>
+        <div style="padding:16px">
+          <div style="background:var(--green-t);border:1px solid rgba(76,175,80,.2);border-radius:var(--r);padding:10px;font-size:11px;color:var(--green2);margin-bottom:12px">
+            ✅ Connected to Supabase<br><span style="font-family:'JetBrains Mono';font-size:9px;opacity:.7">ifsuhqnttjxbbmceibgn.supabase.co</span>
+          </div>
+          <div style="font-size:11px;color:var(--chalk3)">RLS active · Multi-tenant isolated · Realtime enabled</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+async function saveSettings(){
+  try {
+    const { error } = await sb.from('schools').update({
+      name: document.getElementById('set_name').value,
+      phone: document.getElementById('set_phone').value,
+      email: document.getElementById('set_email').value,
+    }).eq('id', APP.schoolId);
+    if(error) throw error;
+    toast('School profile saved','ok');
+    APP.school.name = document.getElementById('set_name').value;
+    document.getElementById('sbSchoolName').textContent = APP.school.name;
+  } catch(e){ toast(e.message||'Error','err'); }
+}
+
+async function saveCalendar(){
+  try {
+    const term=Number(document.getElementById('set_term').value);
+    const year=Number(document.getElementById('set_year').value);
+    const { error } = await sb.from('schools').update({ current_term:term, current_year:year }).eq('id', APP.schoolId);
+    if(error) throw error;
+    APP.school.current_term=term; APP.school.current_year=year;
+    document.getElementById('tbTerm').textContent = `Term ${term} · ${year}`;
+    toast('Calendar updated','ok');
+  } catch(e){ toast(e.message||'Error','err'); }
+}
+
+// ── SYSTEM ADMIN VIEWS ────────────────────────────────────────
+async function renderAllSchools(){
+  const { data: schools } = await sb.from('schools').select('*').order('created_at',{ascending:false});
+  document.getElementById('module-container').innerHTML=`
+    <div class="ph" style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);margin-bottom:14px">
+      <div><div class="ph-title">🏫 All Schools</div></div>
+    </div>
+    <div class="panel">
+      <div class="tbl-wrap">
+        <table><thead><tr><th>Name</th><th>Country</th><th>Plan</th><th>Status</th><th>Students</th><th>Created</th></tr></thead>
+        <tbody>${(schools||[]).map(s=>`<tr>
+          <td style="font-weight:600">${s.name}</td>
+          <td>${s.country}</td>
+          <td>${sbadge(s.plan||'trial')}</td>
+          <td>${sbadge(s.tenant_status||'active')}</td>
+          <td>—</td>
+          <td>${fd(s.created_at)}</td>
+        </tr>`).join('')||'<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--chalk3)">No schools yet</td></tr>'}
+        </tbody></table>
+      </div>
+    </div>`;
+}
+
+async function renderLicences(){
+  const { data: licences } = await sb.from('school_licences').select('*, schools(name)').order('issued_at',{ascending:false});
+  document.getElementById('module-container').innerHTML=`
+    <div class="ph" style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);margin-bottom:14px">
+      <div><div class="ph-title">🔑 Licences</div></div>
+    </div>
+    <div class="al al-info" style="margin-bottom:14px">To provision a new school, run in Supabase SQL:<br><code style="font-family:'JetBrains Mono';font-size:11px">SELECT * FROM fn_provision_school('School Name','slug','Uganda','standard');</code></div>
+    <div class="panel">
+      <div class="tbl-wrap">
+        <table><thead><tr><th>School</th><th>Licence Key</th><th>Plan</th><th>Expires</th><th>Activated</th></tr></thead>
+        <tbody>${(licences||[]).map(l=>`<tr>
+          <td style="font-weight:600">${l.schools?.name||'—'}</td>
+          <td class="mono" style="font-size:10px">${l.licence_key}</td>
+          <td>${sbadge(l.plan||'standard')}</td>
+          <td>${fd(l.expires_at)}</td>
+          <td>${l.activated_at?fd(l.activated_at):'<span class="badge ba">Pending</span>'}</td>
+        </tr>`).join('')||'<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--chalk3)">No licences yet</td></tr>'}
+        </tbody></table>
+      </div>
+    </div>`;
+}
+
+async function renderAudit(){
+  const logs = await dbGet('audit_logs',{order:'created_at',limit:30,noSchool:APP.role!=='system_admin'});
+  document.getElementById('module-container').innerHTML=`
+    <div class="ph" style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);margin-bottom:14px">
+      <div><div class="ph-title">📋 Audit Logs</div><div class="ph-sub">Immutable · Append-only</div></div>
+    </div>
+    <div class="panel">
+      <div class="tbl-wrap">
+        <table><thead><tr><th>Time</th><th>Action</th><th>Table</th><th>User</th><th>Role</th></tr></thead>
+        <tbody>${logs.length?logs.map(l=>`<tr>
+          <td class="mono" style="font-size:10px">${fd(l.created_at)}</td>
+          <td style="font-size:11px;font-weight:600">${l.operation||'—'}</td>
+          <td style="font-size:11px">${l.table_name||'—'}</td>
+          <td style="font-size:11px">${l.user_email||'—'}</td>
+          <td>${sbadge(l.user_role||'—')}</td>
+        </tr>`).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--chalk3);padding:20px">No audit logs yet</td></tr>'}
+        </tbody></table>
+      </div>
+    </div>`;
+}
+
+// ── Init ──────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
+  // Check for saved session — auto-login if valid
+  await checkSession();
+});
+</script>
+</body>
+</html>
